@@ -1337,6 +1337,14 @@ button {
     font-size: 0.875rem;
 }
 
+/* Sports & Entertainment Grid */
+.sports-ent-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 36px;
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
     .main-header .container {
@@ -1368,49 +1376,298 @@ button {
     .footer-grid {
         grid-template-columns: 1fr 1fr;
     }
+
+    .sports-ent-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 @media (max-width: 768px) {
-    .top-utility-bar .utility-left, .top-utility-bar .utility-right {
-        justify-content: center;
+    /* Top Utility Bar on Mobile */
+    .top-utility-bar {
+        padding: 8px 0;
+    }
+
+    .top-utility-bar .container {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+    .utility-left {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px 10px;
         width: 100%;
     }
 
+    .utility-right {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .utility-right .icon-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .trending-pills {
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .trending-pills::-webkit-scrollbar {
+        display: none;
+    }
+
+    .live-date-badge, .weather-widget {
+        font-size: 0.8rem;
+    }
+
+    /* Main Header & Logo on Mobile */
+    .main-header {
+        padding: 10px 0;
+    }
+
+    .main-header .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .brand-wrapper {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .brand-logo-img {
+        height: 44px;
+        width: auto;
+    }
+
+    .brand-name {
+        font-size: 1.35rem;
+        letter-spacing: -0.5px;
+    }
+
+    .brand-tagline {
+        font-size: 0.75rem;
+    }
+
+    .header-ad-space {
+        display: none; /* Hide large desktop ad banner on small mobile viewports */
+    }
+
+    /* Mobile Navigation Bar & Drawer */
+    .primary-nav {
+        position: relative;
+    }
+
+    .primary-nav .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 16px;
+    }
+
     .mobile-menu-btn {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: var(--radius-sm);
+        color: #FFFFFF;
+        font-size: 1.3rem;
+        cursor: pointer;
     }
 
     .nav-menu-list {
         display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         width: 100%;
-        flex-direction: column;
-        background-color: var(--bg-nav);
-        padding: 10px 0;
+        background-color: var(--brand-blue);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        z-index: 1000;
+        padding: 8px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .nav-menu-list.mobile-open {
         display: flex;
+        flex-direction: column;
+    }
+
+    .nav-link {
+        padding: 12px 20px;
+        font-size: 0.98rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* NEPSE Stock Bar on Mobile */
+    .nepse-bar .container {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 14px;
+        padding: 8px 12px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .nepse-bar .container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nepse-item {
+        font-size: 0.8rem;
+    }
+
+    /* Hero Story & Secondary Cards */
+    .hero-card-body {
+        padding: 16px;
+    }
+
+    .hero-title {
+        font-size: 1.3rem;
+        line-height: 1.4;
+    }
+
+    .hero-summary {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 12px;
     }
 
     .sub-lead-card {
-        grid-template-columns: 100px 1fr;
+        grid-template-columns: 105px 1fr;
+        gap: 12px;
+        padding: 10px;
     }
 
     .sub-lead-thumb {
-        width: 100px;
-        height: 75px;
+        width: 105px;
+        height: 78px;
     }
 
-    .news-grid-3, .opinion-grid, .pradesh-news-container, .video-grid {
+    .sub-lead-title {
+        font-size: 0.92rem;
+        line-height: 1.35;
+    }
+
+    /* Grids to Single Column */
+    .news-grid-3, .opinion-grid, .pradesh-news-container, .video-grid, .sports-ent-grid {
         grid-template-columns: 1fr;
     }
 
     .footer-grid {
         grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    /* Reader Modal Ergonomics on Mobile */
+    .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        padding: 0;
+    }
+
+    .modal-close-btn {
+        position: sticky;
+        top: 12px;
+        right: 12px;
+        float: right;
+        z-index: 100;
+        background: var(--brand-red);
+        color: #FFFFFF;
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .reader-header {
+        padding: 16px 16px 12px;
     }
 
     .reader-title {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        line-height: 1.4;
+    }
+
+    .reader-toolbar {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .audio-player-btn {
+        justify-content: center;
+        width: 100%;
+        padding: 8px 14px;
+    }
+
+    .font-controls {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .reader-body {
+        padding: 16px 16px 40px;
+        font-size: 1.02rem;
+        line-height: 1.7;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-name {
+        font-size: 1.2rem;
+    }
+
+    .hero-title {
+        font-size: 1.2rem;
+    }
+
+    .card-title {
+        font-size: 1.02rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
     }
 }
 
@@ -1451,4 +1708,5 @@ button {
     font-size: 0.85rem;
     color: var(--text-secondary);
 }
+
 
