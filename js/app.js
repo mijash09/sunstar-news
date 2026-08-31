@@ -1,6 +1,6 @@
 /**
  * Sunstar News Main Application Script
- * Dynamic Rendering & Interactivity Engine - OnlineKhabar Integration
+ * Dynamic Rendering & Interactivity Engine - Sunstar News Edition
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -137,7 +137,7 @@ function renderHeroSection() {
         <div class="hero-card" onclick="openArticleModal('${lead.id}')">
             <div class="hero-img-wrapper">
                 <span class="category-tag">${lead.category}</span>
-                <span class="source-badge">🔴 ${lead.source || 'OnlineKhabar.com'}</span>
+                <span class="source-badge">🔴 ${lead.source || 'SunstarNews.com'}</span>
                 <img src="${lead.image}" alt="${lead.title}" loading="lazy">
             </div>
             <div class="hero-card-body">
@@ -165,7 +165,7 @@ function renderHeroSection() {
             <div>
                 <h2 class="sub-lead-title">${item.title}</h2>
                 <div class="sub-lead-meta">
-                    <span>${item.category}</span> • <span class="source-pill">${item.source || 'अनलाइनखबर'}</span> • <span>${item.time}</span>
+                    <span>${item.category}</span> • <span class="source-pill">${item.source || 'सनस्टार न्युज'}</span> • <span>${item.time}</span>
                 </div>
             </div>
         </div>
@@ -180,7 +180,7 @@ function renderTimelineFeed() {
     timelineContainer.innerHTML = items.map(item => `
         <li class="timeline-item" onclick="openArticleModal('${item.id}')">
             <div class="timeline-dot"></div>
-            <div class="timeline-time">${item.time} • <span style="color:var(--brand-orange); font-weight:600;">${item.source || 'अनलाइनखबर'}</span></div>
+            <div class="timeline-time">${item.time} • <span style="color:var(--brand-orange); font-weight:600;">${item.source || 'सनस्टार न्युज'}</span></div>
             <div class="timeline-title">${item.title}</div>
         </li>
     `).join('');
@@ -194,7 +194,7 @@ function renderPoliticsSection() {
     container.innerHTML = articles.map(item => `
         <div class="standard-news-card" onclick="openArticleModal('${item.id}')">
             <div class="card-thumb">
-                <span class="source-badge">🔴 ${item.source || 'OnlineKhabar'}</span>
+                <span class="source-badge">🔴 ${item.source || 'Sunstar News'}</span>
                 <img src="${item.image}" alt="${item.title}" loading="lazy">
             </div>
             <div class="card-body">
@@ -217,7 +217,7 @@ function renderBusinessSection() {
     container.innerHTML = articles.map(item => `
         <div class="standard-news-card" onclick="openArticleModal('${item.id}')">
             <div class="card-thumb">
-                <span class="source-badge">🔴 ${item.source || 'OnlineKhabar'}</span>
+                <span class="source-badge">🔴 ${item.source || 'Sunstar News'}</span>
                 <img src="${item.image}" alt="${item.title}" loading="lazy">
             </div>
             <div class="card-body">
@@ -264,7 +264,7 @@ function renderPradeshSection(pradeshKey) {
         <div class="pradesh-item-card" onclick="openArticleModal('${item.id}')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span class="pradesh-badge">📍 ${item.location}</span>
-                <span style="font-size:0.75rem; color:var(--brand-orange); font-weight:600;">${item.source || 'अनलाइनखबर'}</span>
+                <span style="font-size:0.75rem; color:var(--brand-orange); font-weight:600;">${item.source || 'सनस्टार न्युज'}</span>
             </div>
             <h3 class="card-title" style="font-size:1.05rem; margin-top:6px;">${item.title}</h3>
             <div class="article-meta" style="border:none; padding:0; margin-top:10px;">
@@ -286,7 +286,7 @@ function renderSportsAndEntertainment() {
         sportsContainer.innerHTML = SUNSTAR_DATA.sportsNews.map(item => `
             <div class="standard-news-card" onclick="openArticleModal('${item.id}')">
                 <div class="card-thumb">
-                    <span class="source-badge">🔴 ${item.source || 'OnlineKhabar'}</span>
+                    <span class="source-badge">🔴 ${item.source || 'Sunstar News'}</span>
                     <img src="${item.image}" alt="${item.title}" loading="lazy">
                 </div>
                 <div class="card-body">
@@ -302,7 +302,7 @@ function renderSportsAndEntertainment() {
         entContainer.innerHTML = SUNSTAR_DATA.entertainmentNews.map(item => `
             <div class="standard-news-card" onclick="openArticleModal('${item.id}')">
                 <div class="card-thumb">
-                    <span class="source-badge">🔴 ${item.source || 'OnlineKhabar'}</span>
+                    <span class="source-badge">🔴 ${item.source || 'Sunstar News'}</span>
                     <img src="${item.image}" alt="${item.title}" loading="lazy">
                 </div>
                 <div class="card-body">
@@ -321,7 +321,7 @@ function renderWorldNews() {
     container.innerHTML = SUNSTAR_DATA.worldNews.map(item => `
         <div class="standard-news-card" onclick="openArticleModal('${item.id}')">
             <div class="card-thumb">
-                <span class="source-badge">🔴 ${item.source || 'OnlineKhabar'}</span>
+                <span class="source-badge">🔴 ${item.source || 'Sunstar News'}</span>
                 <img src="${item.image}" alt="${item.title}" loading="lazy">
             </div>
             <div class="card-body">
@@ -343,7 +343,7 @@ function renderVideoGallery() {
                 <img src="${item.thumbnail}" alt="${item.title}">
                 <div class="play-icon-overlay">▶</div>
                 <span class="video-duration">${item.duration}</span>
-                <span class="source-badge" style="left:10px; right:auto;">🔴 ${item.source || 'OnlineKhabar'}</span>
+                <span class="source-badge" style="left:10px; right:auto;">🔴 ${item.source || 'Sunstar News'}</span>
             </div>
             <h3 class="video-title">${item.title}</h3>
         </div>
@@ -433,14 +433,14 @@ function openArticleModal(articleId) {
         found = {
             title: "समाचार सम्बन्धी विस्तृत जानकारी",
             category: "समाचार",
-            author: "अनलाइनखबर समाचार डेस्क",
-            authorImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+            author: "सनस्टार समाचार डेस्क",
+            authorImage: "assets/sunstar-logo.jpg",
             time: "भर्खरै",
             date: "१५ भाद्र २०८३",
-            source: "OnlineKhabar.com",
-            image: "https://images.unsplash.com/photo-1547683905-f686c993aae5?w=1200",
-            summary: "घटनाक्रमको थप विवरण प्राप्त हुने क्रममा छ। अनलाइनखबर र सनस्टार न्युज अपडेटमा रहनुहोला।",
-            content: `<p>यस समाचारबारे थप विवरण र प्रत्यक्ष अपडेटहरू अनलाइनखबर र सनस्टार न्युजको अनलाइन प्लेटफर्ममार्फत नियमित सम्प्रेषण भइरहेको छ।</p><p>स्थानीय प्रतिनिधि तथा सरोकारवाला निकायहरूसँग समन्वय गरी सत्य, तथ्य र निष्पक्ष समाचार प्रस्तुत गर्न हाम्रो टोली निरन्तर क्रियाशील छ।</p>`
+            source: "SunstarNews.com",
+            image: "assets/sunstar-logo.jpg",
+            summary: "घटनाक्रमको थप विवरण प्राप्त हुने क्रममा छ। सनस्टार न्युज अपडेटमा रहनुहोला।",
+            content: `<p>यस समाचारबारे थप विवरण र प्रत्यक्ष अपडेटहरू सनस्टार न्युजको अनलाइन प्लेटफर्ममार्फत नियमित सम्प्रेषण भइरहेको छ।</p><p>स्थानीय प्रतिनिधि तथा सरोकारवाला निकायहरूसँग समन्वय गरी सत्य, तथ्य र निष्पक्ष समाचार प्रस्तुत गर्न हाम्रो टोली निरन्तर क्रियाशील छ।</p>`
         };
     }
 
@@ -459,7 +459,7 @@ function openArticleModal(articleId) {
             <div class="article-meta">
                 <div class="author-info">
                     <img src="${found.authorImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" class="author-avatar" alt="Author">
-                    <span>${found.author || 'अनलाइनखबर डेस्क'}</span>
+                    <span>${found.author || 'सनस्टार डेस्क'}</span>
                 </div>
                 <span>📅 ${found.date || '१५ भाद्र २०८३'}</span>
                 <span>⏱️ ${found.time || 'भर्खरै'}</span>
@@ -581,7 +581,7 @@ function updateThemeIcon(theme) {
 }
 
 function triggerSearchModal() {
-    const query = prompt("अनलाइनखबर/सनस्टार समाचार खोज्नुहोस् (Keyword enter गर्नुहोस्):");
+    const query = prompt("सनस्टार समाचार खोज्नुहोस् (Keyword enter गर्नुहोस्):");
     if (query && query.trim() !== '') {
         const term = query.trim().toLowerCase();
         const allArticles = [
