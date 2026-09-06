@@ -7,8 +7,8 @@ import { loginAction } from '@/app/actions/auth';
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState('Sitaram');
-  const [password, setPassword] = useState('Sitaram@123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -24,100 +24,79 @@ export default function LoginPage() {
     }
   }
 
-  const fillCredentials = (u: string, p: string) => {
-    setUsername(u);
-    setPassword(p);
-  };
-
   return (
-    <div className="login-page-container">
-      <div className="login-card-wrapper">
-        {/* Brand Header */}
-        <div className="login-brand-header">
-          <div className="login-logo-badge">
-            <span className="logo-sun-symbol">☀️</span>
-            <span className="logo-text-main">SUNSTAR</span>
-            <span className="logo-badge-tag">ADMIN</span>
+    <div className="simple-login-container">
+      <div className="simple-login-box">
+        {/* Logo & Header */}
+        <div className="simple-login-header">
+          <div className="simple-brand-logo">
+            <span className="sun-icon">☀️</span>
+            <span className="brand-name">सनस्टार न्युज</span>
           </div>
-          <h1 className="login-portal-title">सनस्टार न्युज CMS लगइन</h1>
-          <p className="login-portal-subtitle">
-            सम्पादक तथा व्यवस्थापक डिजिटल पहुँच कक्ष
-          </p>
+          <h1 className="simple-login-title">कर्मचारी लगइन</h1>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="login-error-alert">
-            <span>⚠️ {error}</span>
+          <div className="simple-error-msg">
+            ⚠️ {error}
           </div>
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="login-form-body">
-          <div className="form-group-item">
-            <label className="form-label">
-              👤 प्रयोगकर्ता नाम वा इमेल (Username / Email)
-            </label>
+        <form onSubmit={handleSubmit} className="simple-login-form">
+          <div className="simple-form-group">
+            <label htmlFor="username">प्रयोगकर्ता नाम वा इमेल</label>
             <input
+              id="username"
               type="text"
               name="username"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="e.g. Sitaram"
-              className="login-input-field"
+              placeholder="Username or Email"
+              className="simple-input"
             />
           </div>
 
-          <div className="form-group-item">
-            <label className="form-label">
-              🔒 पासवर्ड (Password)
-            </label>
+          <div className="simple-form-group">
+            <label htmlFor="password">पासवर्ड</label>
             <input
+              id="password"
               type="password"
               name="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••••••"
-              className="login-input-field"
+              placeholder="Password"
+              className="simple-input"
             />
-          </div>
-
-          {/* Quick Demo Login Credentials Filler */}
-          <div className="quick-credentials-box">
-            <span className="quick-fill-label">⚡ द्रुत लगइन छनोट (Quick Fill):</span>
-            <div className="quick-fill-buttons">
-              <button
-                type="button"
-                className="quick-btn admin-btn"
-                onClick={() => fillCredentials('Sitaram', 'Sitaram@123')}
-              >
-                👑 Sitaram (मुख्य सम्पादक)
-              </button>
-              <button
-                type="button"
-                className="quick-btn backup-btn"
-                onClick={() => fillCredentials('admin', 'Sitaram@123')}
-              >
-                🛠️ Admin (व्यवस्थापक)
-              </button>
-            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="login-submit-button"
+            className="simple-submit-btn"
           >
-            {loading ? 'लगइन हुँदैछ...' : '🔐 लगइन गर्नुहोस् (Sign In to CMS)'}
+            {loading ? 'लगइन हुँदैछ...' : 'लगइन गर्नुहोस्'}
           </button>
         </form>
 
-        {/* Back Link */}
-        <div className="login-footer-link">
-          <Link href="/" className="back-to-home-link">
-            ← सनस्टार न्युज मुख्य पृष्ठमा फर्कनुहोस् (Back to Portal)
+        {/* Footer & Quick Fill */}
+        <div className="simple-login-footer">
+          <button
+            type="button"
+            className="simple-autofill-btn"
+            onClick={() => {
+              setUsername('Sitaram');
+              setPassword('Sitaram@123');
+            }}
+          >
+            🔑 Sitaram खाता स्वतः भर्नुहोस्
+          </button>
+
+          <Link href="/" className="simple-back-link">
+            ← मुख्य पृष्ठमा फर्कनुहोस्
           </Link>
         </div>
       </div>
