@@ -60,6 +60,17 @@ export interface StoryItem {
   articleId?: string;
 }
 
+export interface RashifalItem {
+  id: string;
+  sign: string;
+  latinName: string;
+  symbol: string;
+  dateRange?: string;
+  luckyColor?: string;
+  luckyNumber?: string;
+  prediction: string;
+}
+
 export interface PollOption {
   id: string;
   label: string;
