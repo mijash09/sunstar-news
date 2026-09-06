@@ -236,7 +236,7 @@ export const SUNSTAR_DATA = {
       sign: "मेष",
       latinName: "Aries",
       symbol: "♈",
-      image: "/images/zodiac/mesh.svg",
+      image: "/images/zodiac/mesh.png",
       dateRange: "चैत १५ - वैशाख १५",
       luckyColor: "रातो",
       luckyNumber: "९",
