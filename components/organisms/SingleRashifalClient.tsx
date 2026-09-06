@@ -163,16 +163,20 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
                   height: '90px',
                   borderRadius: '50%',
                   backgroundColor: 'rgba(249, 115, 22, 0.12)',
-                  color: 'var(--brand-orange)',
-                  fontSize: '3.8rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   border: '2px solid rgba(249, 115, 22, 0.3)',
                   boxShadow: '0 4px 14px rgba(249, 115, 22, 0.15)',
+                  padding: '8px',
                 }}
               >
-                {initialItem.symbol}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={initialItem.image || `/images/zodiac/${initialItem.id}.svg`}
+                  alt={initialItem.sign}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
               </div>
 
               <div>
@@ -423,9 +427,12 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
                 }}
                 className="other-sign-card"
               >
-                <span style={{ fontSize: '2rem', color: 'var(--brand-orange)', lineHeight: 1 }}>
-                  {s.symbol}
-                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s.image || `/images/zodiac/${s.id}.svg`}
+                  alt={s.sign}
+                  style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0 }}
+                />
                 <div>
                   <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                     {s.sign} ({s.latinName})

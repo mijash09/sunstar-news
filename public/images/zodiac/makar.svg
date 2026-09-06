@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-makar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="50%" stop-color="#1E40AF" />
+      <stop offset="100%" stop-color="#172554" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#EAB308" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="92" fill="url(#bg-makar)" stroke="url(#gold)" stroke-width="5"/>
+  <circle cx="100" cy="100" r="82" fill="none" stroke="#FDE047" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+
+  <!-- Capricorn Emblem (Capricorn / मकर) -->
+  <g fill="none" stroke="url(#gold)" stroke-width="9" stroke-linecap="round">
+    <path d="M 60 65 L 82 125 L 105 75 Q 125 75, 125 105 Q 125 138, 105 138 C 90 138, 90 120, 105 120" />
+  </g>
+
+  <rect x="40" y="148" width="120" height="26" rx="13" fill="#111827" stroke="url(#gold)" stroke-width="1.5"/>
+  <text x="100" y="165" font-family="'Mukta', sans-serif" font-weight="900" font-size="14" fill="#FDE047" text-anchor="middle">मकर (Capricorn)</text>
+</svg>

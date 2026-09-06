@@ -215,9 +215,12 @@ export default function RashifalPage() {
                         marginBottom: '14px',
                       }}
                     >
-                      <span style={{ fontSize: '2.5rem', color: 'var(--brand-orange)', lineHeight: 1 }}>
-                        {item.symbol}
-                      </span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.image || `/images/zodiac/${item.id}.svg`}
+                        alt={signName}
+                        style={{ width: '58px', height: '58px', objectFit: 'contain' }}
+                      />
                       <span
                         style={{
                           fontSize: '0.75rem',

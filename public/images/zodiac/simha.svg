@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-simha" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C2410C" />
+      <stop offset="50%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#9A3412" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#EAB308" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="92" fill="url(#bg-simha)" stroke="url(#gold)" stroke-width="5"/>
+  <circle cx="100" cy="100" r="82" fill="none" stroke="#FDE047" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+
+  <!-- Lion Emblem (Leo / सिंह) -->
+  <g fill="none" stroke="url(#gold)" stroke-width="9" stroke-linecap="round">
+    <circle cx="70" cy="75" r="14" fill="url(#gold)"/>
+    <path d="M 80 84 Q 130 90, 115 130 Q 100 148, 130 135 Q 145 125, 140 100" />
+  </g>
+
+  <rect x="50" y="148" width="100" height="26" rx="13" fill="#111827" stroke="url(#gold)" stroke-width="1.5"/>
+  <text x="100" y="165" font-family="'Mukta', sans-serif" font-weight="900" font-size="14" fill="#FDE047" text-anchor="middle">सिंह (Leo)</text>
+</svg>

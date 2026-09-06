@@ -65,6 +65,7 @@ export interface RashifalItem {
   sign: string;
   latinName: string;
   symbol: string;
+  image?: string;
   dateRange?: string;
   luckyColor?: string;
   luckyNumber?: string;
@@ -235,6 +236,7 @@ export const SUNSTAR_DATA = {
       sign: "मेष",
       latinName: "Aries",
       symbol: "♈",
+      image: "/images/zodiac/mesh.svg",
       dateRange: "चैत १५ - वैशाख १५",
       luckyColor: "रातो",
       luckyNumber: "९",
@@ -245,6 +247,7 @@ export const SUNSTAR_DATA = {
       sign: "वृष",
       latinName: "Taurus",
       symbol: "♉",
+      image: "/images/zodiac/vrish.svg",
       dateRange: "वैशाख १६ - जेठ १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -255,6 +258,7 @@ export const SUNSTAR_DATA = {
       sign: "मिथुन",
       latinName: "Gemini",
       symbol: "♊",
+      image: "/images/zodiac/mithun.svg",
       dateRange: "जेठ १६ - असार १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -265,6 +269,7 @@ export const SUNSTAR_DATA = {
       sign: "कर्कट",
       latinName: "Cancer",
       symbol: "♋",
+      image: "/images/zodiac/karkat.svg",
       dateRange: "असार १६ - साउन १५",
       luckyColor: "गुलाबी",
       luckyNumber: "२",
@@ -275,6 +280,7 @@ export const SUNSTAR_DATA = {
       sign: "सिंह",
       latinName: "Leo",
       symbol: "♌",
+      image: "/images/zodiac/simha.svg",
       dateRange: "साउन १६ - भदौ १५",
       luckyColor: "पहेंलो",
       luckyNumber: "१",
@@ -285,6 +291,7 @@ export const SUNSTAR_DATA = {
       sign: "कन्या",
       latinName: "Virgo",
       symbol: "♍",
+      image: "/images/zodiac/kanya.svg",
       dateRange: "भदौ १६ - असोज १५",
       luckyColor: "हरियो",
       luckyNumber: "५",

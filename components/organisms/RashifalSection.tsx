@@ -50,15 +50,13 @@ export default function RashifalSection() {
             }}
             className="rashifal-card-item"
           >
-            <div
-              style={{
-                fontSize: '2rem',
-                lineHeight: 1,
-                marginBottom: '8px',
-                color: 'var(--brand-orange)',
-              }}
-            >
-              {item.symbol}
+            <div style={{ marginBottom: '8px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.image || `/images/zodiac/${item.id}.svg`}
+                alt={item.sign}
+                style={{ width: '54px', height: '54px', margin: '0 auto', display: 'block', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
+              />
             </div>
             <h3
               style={{

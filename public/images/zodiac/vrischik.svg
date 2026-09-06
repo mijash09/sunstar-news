@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg-vrischik" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#991B1B" />
+      <stop offset="50%" stop-color="#B91C1C" />
+      <stop offset="100%" stop-color="#7F1D1D" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#EAB308" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="92" fill="url(#bg-vrischik)" stroke="url(#gold)" stroke-width="5"/>
+  <circle cx="100" cy="100" r="82" fill="none" stroke="#FDE047" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+
+  <!-- Scorpio Emblem (Scorpio / वृश्चिक) -->
+  <g fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 60 70 V 125 C 60 140, 75 140, 75 120 V 70 C 75 140, 95 140, 95 120 V 70 C 95 140, 120 140, 120 115 C 120 75, 145 100, 145 125 L 140 120 M 145 125 L 150 120" />
+  </g>
+
+  <rect x="40" y="148" width="120" height="26" rx="13" fill="#111827" stroke="url(#gold)" stroke-width="1.5"/>
+  <text x="100" y="165" font-family="'Mukta', sans-serif" font-weight="900" font-size="14" fill="#FDE047" text-anchor="middle">वृश्चिक (Scorpio)</text>
+</svg>
