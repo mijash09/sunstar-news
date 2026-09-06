@@ -25,14 +25,18 @@ export default function RashifalPage() {
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+
     fetch('/api/rashifal?type=' + activePeriod)
       .then((res) => res.json())
       .then((data) => {
-        if (active && data && data.success && Array.isArray(data.predictions)) {
+        if (active && data && Array.isArray(data.predictions) && data.predictions.length > 0) {
           setRashifalList(data.predictions);
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Rashifal API error:', err);
+      })
       .finally(() => {
         if (active) setLoading(false);
       });
