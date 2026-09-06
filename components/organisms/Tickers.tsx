@@ -1,28 +1,51 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SUNSTAR_DATA from '@/lib/data';
 import PulseDot from '@/components/atoms/PulseDot';
 import Link from 'next/link';
 
 export default function Tickers() {
-  const nepseData = SUNSTAR_DATA.nepseTicker;
-  const stocks = SUNSTAR_DATA.trendingStocks;
+  const [stocks, setStocks] = useState<any[]>(SUNSTAR_DATA.trendingStocks || []);
+  const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/nepse')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data && Array.isArray(data.stocks) && data.stocks.length > 0) {
+          setStocks(data.stocks);
+          setIsMarketOpen(!!data.isMarketOpen);
+        }
+      })
+      .catch((err) => {
+        console.warn('Live NEPSE Ticker Fetch Error:', err);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="top-tickers-wrapper">
-      {/* 1. Top Trending Live Stock Ticker Bar (Exact match to requested UI) */}
+      {/* 1. Top Trending Live Stock Ticker Bar */}
       <div className="stock-ticker-bar">
         <div className="container">
           {/* Blue Trending Badge */}
           <div className="trending-blue-badge">
-            Trending..
+            NEPSE Live..
           </div>
 
           {/* Stock Ticker Items Row */}
           <div className="stock-ticker-list">
             {stocks.map((stock, idx) => (
-              <div key={idx} className="stock-ticker-item">
+              <div key={stock.symbol || idx} className="stock-ticker-item">
                 <div className="stock-company-name" title={stock.name}>
                   {stock.name}
                 </div>
@@ -45,9 +68,10 @@ export default function Tickers() {
 
           {/* View Stock Live Button Box */}
           <Link href="/category/business" className="view-stock-live-card">
-            <span className="stock-live-title">View Stock Live</span>
+            <span className="stock-live-title">View NEPSE Live</span>
             <span className="stock-market-status">
-              <span style={{ fontSize: '0.65rem' }}>🔴</span> Market Closed
+              <span style={{ fontSize: '0.65rem' }}>{isMarketOpen ? '🟢' : '🔴'}</span>{' '}
+              {isMarketOpen ? 'Market Open' : 'Market Closed'}
             </span>
           </Link>
         </div>
@@ -73,4 +97,5 @@ export default function Tickers() {
     </div>
   );
 }
+
 
