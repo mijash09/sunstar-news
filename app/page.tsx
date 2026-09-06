@@ -13,7 +13,6 @@ import RashifalSection from '@/components/organisms/RashifalSection';
 import TimelineFeed from '@/components/organisms/TimelineFeed';
 import PollWidget from '@/components/organisms/PollWidget';
 import Footer from '@/components/organisms/Footer';
-import ArticleModal from '@/components/organisms/ArticleModal';
 import SearchModal from '@/components/organisms/SearchModal';
 import SectionHeader from '@/components/molecules/SectionHeader';
 import MainNewsLayout from '@/components/templates/MainNewsLayout';
@@ -22,23 +21,15 @@ import OpinionGridSection from '@/components/organisms/OpinionGridSection';
 import StorySection from '@/components/organisms/StorySection';
 import RightLeadGridSection from '@/components/organisms/RightLeadGridSection';
 import AdBanner from '@/components/molecules/AdBanner';
+import { useRouter } from 'next/navigation';
 import SUNSTAR_DATA, { getArticleById, Article } from '@/lib/data';
 
 export default function HomePage() {
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleSelectArticle = (id: string) => {
-    const found = getArticleById(id);
-    if (found) {
-      setSelectedArticle(found);
-      document.body.style.overflow = 'hidden';
-    }
-  };
-
-  const handleCloseModal = () => {
-    setSelectedArticle(null);
-    document.body.style.overflow = '';
+    router.push(`/news/${id}`);
   };
 
   const LoadMoreButton = ({ label, href }: { label: string; href: string }) => (
@@ -209,7 +200,6 @@ export default function HomePage() {
 
       <Footer onOpenSearch={() => setIsSearchOpen(true)} />
 
-      <ArticleModal article={selectedArticle} onClose={handleCloseModal} />
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}

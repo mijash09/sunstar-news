@@ -6,7 +6,7 @@ import Header from '@/components/organisms/Header';
 import Navigation from '@/components/organisms/Navigation';
 import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
-import ArticleModal from '@/components/organisms/ArticleModal';
+import { useRouter } from 'next/navigation';
 import { RashifalItem, getArticleById } from '@/lib/data';
 
 interface Comment {
@@ -71,9 +71,9 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
   const [commentInput, setCommentInput] = useState('');
   const [commentNotice, setCommentNotice] = useState<string | null>(null);
 
-  // Search & Article Modals
+  // Search Modal & Router
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [selectedArticle, setSelectedArticle] = useState<any>(null);
 
   useEffect(() => {
     let active = true;
@@ -173,7 +173,7 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={initialItem.image || `/images/zodiac/${initialItem.id}.svg`}
+                  src={initialItem.image || `/images/zodiac/${initialItem.id}.png`}
                   alt={initialItem.sign}
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
@@ -429,7 +429,7 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={s.image || `/images/zodiac/${s.id}.svg`}
+                  src={s.image || `/images/zodiac/${s.id}.png`}
                   alt={s.sign}
                   style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0 }}
                 />
@@ -449,13 +449,11 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
 
       <Footer onOpenSearch={() => setIsSearchOpen(true)} />
 
-      <ArticleModal article={selectedArticle} onClose={() => setSelectedArticle(null)} />
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onSelectArticle={(id) => {
-          const found = getArticleById(id);
-          if (found) setSelectedArticle(found);
+          router.push(`/news/${id}`);
         }}
       />
     </div>

@@ -3,6 +3,7 @@ export interface Article {
   title: string;
   slug?: string;
   category: string;
+  categories?: string[];
   categorySlug?: string;
   author?: string;
   authorRole?: string;
@@ -91,7 +92,15 @@ export interface BannerAd {
   title: string;
   imageUrl: string;
   targetUrl: string;
-  position: 'header-top' | 'hero-side' | 'mid-content-1' | 'mid-content-2' | 'sidebar-widget' | 'footer-top';
+  position:
+    | 'header-top'
+    | 'hero-side'
+    | 'mid-content-1'
+    | 'mid-content-2'
+    | 'sidebar-widget'
+    | 'single-news-sidebar'
+    | 'rashifal-top'
+    | 'footer-top';
   isActive: boolean;
   clicksCount?: number;
 }
@@ -247,7 +256,7 @@ export const SUNSTAR_DATA = {
       sign: "वृष",
       latinName: "Taurus",
       symbol: "♉",
-      image: "/images/zodiac/vrish.svg",
+      image: "/images/zodiac/vrish.png",
       dateRange: "वैशाख १६ - जेठ १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -258,7 +267,7 @@ export const SUNSTAR_DATA = {
       sign: "मिथुन",
       latinName: "Gemini",
       symbol: "♊",
-      image: "/images/zodiac/mithun.svg",
+      image: "/images/zodiac/mithun.png",
       dateRange: "जेठ १६ - असार १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -269,7 +278,7 @@ export const SUNSTAR_DATA = {
       sign: "कर्कट",
       latinName: "Cancer",
       symbol: "♋",
-      image: "/images/zodiac/karkat.svg",
+      image: "/images/zodiac/karkat.png",
       dateRange: "असार १६ - साउन १५",
       luckyColor: "गुलाबी",
       luckyNumber: "२",
@@ -280,7 +289,7 @@ export const SUNSTAR_DATA = {
       sign: "सिंह",
       latinName: "Leo",
       symbol: "♌",
-      image: "/images/zodiac/simha.svg",
+      image: "/images/zodiac/simha.png",
       dateRange: "साउन १६ - भदौ १५",
       luckyColor: "पहेंलो",
       luckyNumber: "१",
@@ -291,7 +300,7 @@ export const SUNSTAR_DATA = {
       sign: "कन्या",
       latinName: "Virgo",
       symbol: "♍",
-      image: "/images/zodiac/kanya.svg",
+      image: "/images/zodiac/kanya.png",
       dateRange: "भदौ १६ - असोज १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -302,6 +311,7 @@ export const SUNSTAR_DATA = {
       sign: "तुला",
       latinName: "Libra",
       symbol: "♎",
+      image: "/images/zodiac/tula.png",
       dateRange: "असोज १६ - कात्तिक १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -312,6 +322,7 @@ export const SUNSTAR_DATA = {
       sign: "वृश्चिक",
       latinName: "Scorpio",
       symbol: "♏",
+      image: "/images/zodiac/vrischik.png",
       dateRange: "कात्तिक १६ - मंसीर १५",
       luckyColor: "रातो",
       luckyNumber: "९",
@@ -322,6 +333,7 @@ export const SUNSTAR_DATA = {
       sign: "धनु",
       latinName: "Sagittarius",
       symbol: "♐",
+      image: "/images/zodiac/dhanu.png",
       dateRange: "मंसीर १६ - पुस १५",
       luckyColor: "पहेंलो",
       luckyNumber: "३",
@@ -332,6 +344,7 @@ export const SUNSTAR_DATA = {
       sign: "मकर",
       latinName: "Capricorn",
       symbol: "♑",
+      image: "/images/zodiac/makar.png",
       dateRange: "पुस १६ - माघ १५",
       luckyColor: "नीलो",
       luckyNumber: "८",
@@ -342,6 +355,7 @@ export const SUNSTAR_DATA = {
       sign: "कुम्भ",
       latinName: "Aquarius",
       symbol: "♒",
+      image: "/images/zodiac/kumbha.png",
       dateRange: "माघ १६ - फागुन १५",
       luckyColor: "नीलो",
       luckyNumber: "८",
@@ -352,6 +366,7 @@ export const SUNSTAR_DATA = {
       sign: "मीन",
       latinName: "Pisces",
       symbol: "♓",
+      image: "/images/zodiac/meen.png",
       dateRange: "फागुन १६ - चैत १४",
       luckyColor: "पहेंलो",
       luckyNumber: "३",

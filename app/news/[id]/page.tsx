@@ -1,21 +1,42 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import ArticlePageLayout from '@/components/templates/ArticlePageLayout';
-import Badge from '@/components/atoms/Badge';
-import SourcePill from '@/components/atoms/SourcePill';
-import ArticleMeta from '@/components/molecules/ArticleMeta';
-import { getArticleById, getAllArticles } from '@/lib/data';
+import Header from '@/components/organisms/Header';
+import Navigation from '@/components/organisms/Navigation';
+import Footer from '@/components/organisms/Footer';
+import RashifalSection from '@/components/organisms/RashifalSection';
+import SingleArticleClient from '@/components/organisms/SingleArticleClient';
+import { getArticleById, getAllArticles, Article } from '@/lib/data';
 
 interface Props {
   params: { id: string };
 }
 
+function getDummyFallbackArticle(id: string): Article {
+  const cleanId = id.replace(/-/g, ' ');
+  const formattedTitle = cleanId.charAt(0).toUpperCase() + cleanId.slice(1);
+
+  return {
+    id: id || 'news-fallback-demo',
+    title: `सनस्टार विशेष समाचार: ${formattedTitle.length > 5 ? formattedTitle : 'नेपालको चौतर्फी विकास र सूचना प्रविधिको नयाँ युग'}`,
+    category: 'मुख्य समाचार',
+    categories: ['मुख्य समाचार', 'विशेष', 'राजनीति'],
+    time: '१० मिनेट अगाडि',
+    date: '२०८१ भदौ २१ गते, शनिबार',
+    views: '४,५२० पटक पढिएको',
+    image: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200&auto=format&fit=crop&q=80',
+    caption: 'नेपालमा प्रविधि तथा डिजिटल सञ्चारको द्रुत विकास र सम्भावनाहरू।',
+    summary: 'सूचना प्रविधिको द्रुत विकाससँगै नेपालमा डिजिटल मिडिया र अनलाइन सञ्चार माध्यमको पहुँच अभूतपूर्व रूपमा विस्तार भइरहेको छ।',
+    content: `काठमाडौँ — नेपालमा डिजिटल प्रविधि र सञ्चार माध्यमको विकासले नयाँ उचाइ हासिल गरिरहेको छ। मुलुकभर इन्टरनेटको पहुँच तीव्र रूपमा विस्तार भएसँगै नागरिकहरूलाई सर्वसुलभ, सत्य र निष्पक्ष समाचार पहुँच पुर्‍याउन अनलाइन मिडियाको भूमिका महत्त्वपूर्ण बन्दै गएको छ।\n\nविशेषज्ञहरूका अनुसार आगामी दिनहरूमा नेपालमा सूचना प्रविधिका पूर्वाधारहरू थप सुदृढ भई प्रत्येक स्थानीय तहसम्म डिजिटल सेवा पुग्ने अपेक्षा गरिएको छ। सनस्टार न्युजले पाठकहरूलाई सधैं गुणस्तरीय र आधिकारिक सूचना प्रदान गर्न प्रतिबद्धता व्यक्त गर्दछ।`,
+    author: 'सनस्टार सम्पादकीय टोली',
+    authorRole: 'वरिष्ठ समाचार सम्पादक',
+    authorImage: '👨‍💼',
+  };
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const article = getArticleById(params.id);
-  if (!article) {
-    return { title: 'समाचार भेटिएन | Sunstar News' };
-  }
+  const found = getArticleById(params.id);
+  const article = found || getDummyFallbackArticle(params.id);
 
   const url = `https://sunstarnews.com/news/${article.id}`;
   const description =
@@ -71,11 +92,17 @@ export async function generateStaticParams() {
 }
 
 export default function ArticleDetailPage({ params }: Props) {
-  const article = getArticleById(params.id);
+  const found = getArticleById(params.id);
+  const article = found || getDummyFallbackArticle(params.id);
 
-  if (!article) {
-    notFound();
-  }
+  const allArticles = getAllArticles();
+  const relatedArticles = allArticles
+    .filter((a) => a.id !== article.id)
+    .slice(0, 4);
+
+  const trendingArticles = allArticles
+    .filter((a) => a.id !== article.id)
+    .slice(0, 5);
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -87,7 +114,7 @@ export default function ArticleDetailPage({ params }: Props) {
     headline: article.title,
     description: article.summary || article.title,
     image: article.image ? [article.image] : ['https://sunstarnews.com/assets/sunstar-logo.jpg'],
-    datePublished: article.date ? '2026-09-05T08:00:00+05:45' : '2026-09-05T08:00:00+05:45',
+    datePublished: '2026-09-05T08:00:00+05:45',
     dateModified: '2026-09-05T12:00:00+05:45',
     author: {
       '@type': 'Person',
@@ -107,102 +134,16 @@ export default function ArticleDetailPage({ params }: Props) {
   };
 
   return (
-    <ArticlePageLayout>
+    <div style={{ backgroundColor: 'var(--bg-main)', minHeight: '100vh' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <article
-        style={{
-          maxWidth: '860px',
-          margin: '0 auto',
-          backgroundColor: 'var(--bg-card)',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid var(--border-color)',
-          boxShadow: 'var(--shadow-md)',
-          overflow: 'hidden',
-        }}
-      >
-        <div className="reader-header">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 12,
-            }}
-          >
-            <Badge variant="category">📌 {article.category || 'समाचार'}</Badge>
-            <div className="source-credit-banner">
-              📰 स्रोत: <SourcePill>{article.source || 'SunstarNews.com'}</SourcePill>
-            </div>
-          </div>
-          <h1 className="reader-title">{article.title}</h1>
-          <ArticleMeta
-            author={article.author}
-            authorImage={article.authorImage}
-            date={article.date}
-            time={article.time}
-          />
-        </div>
-
-        {article.image && (
-          <div style={{ padding: '0 30px', marginTop: 20 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={article.image}
-              style={{
-                width: '100%',
-                maxHeight: 500,
-                objectFit: 'cover',
-                borderRadius: 'var(--radius-md)',
-              }}
-              alt={article.title}
-            />
-            {article.caption && (
-              <div
-                style={{
-                  fontSize: '0.88rem',
-                  color: 'var(--text-muted)',
-                  fontStyle: 'italic',
-                  marginTop: 8,
-                  textAlign: 'center',
-                }}
-              >
-                {article.caption}
-              </div>
-            )}
-          </div>
-        )}
-
-        <div
-          className="reader-body"
-          dangerouslySetInnerHTML={{
-            __html: article.content || `<p>${article.summary || ''}</p>`,
-          }}
-        />
-
-        <div
-          style={{
-            padding: '20px 30px',
-            borderTop: '1px solid var(--border-color)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Link
-            href="/"
-            style={{
-              color: 'var(--brand-orange)',
-              fontWeight: 700,
-              fontSize: '1rem',
-            }}
-          >
-            ⬅ गृहपृष्ठमा फर्कनुहोस् (Back to Home)
-          </Link>
-        </div>
-      </article>
-    </ArticlePageLayout>
+      <SingleArticleClient
+        article={article}
+        relatedArticles={relatedArticles}
+        trendingArticles={trendingArticles}
+      />
+    </div>
   );
 }

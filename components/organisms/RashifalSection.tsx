@@ -53,7 +53,7 @@ export default function RashifalSection() {
             <div style={{ marginBottom: '8px' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={item.image || `/images/zodiac/${item.id}.svg`}
+                src={item.image || `/images/zodiac/${item.id}.png`}
                 alt={item.sign}
                 style={{ width: '54px', height: '54px', margin: '0 auto', display: 'block', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
               />
@@ -174,10 +174,15 @@ export default function RashifalSection() {
                 marginBottom: '16px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '2.5rem', color: 'var(--brand-orange)' }}>
-                  {(selectedSign as any).symbol}
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', flexShrink: 0, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={(selectedSign as any).image || `/images/zodiac/${(selectedSign as any).id}.png`}
+                    alt={(selectedSign as any).sign}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
                 <div>
                   <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {(selectedSign as any).sign} ({(selectedSign as any).latinName})

@@ -217,7 +217,7 @@ export default function RashifalPage() {
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={item.image || `/images/zodiac/${item.id}.svg`}
+                        src={item.image || `/images/zodiac/${item.id}.png`}
                         alt={signName}
                         style={{ width: '58px', height: '58px', objectFit: 'contain' }}
                       />
@@ -346,10 +346,15 @@ export default function RashifalPage() {
                   marginBottom: '20px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <span style={{ fontSize: '3rem', color: 'var(--brand-orange)' }}>
-                    {selectedSign.symbol}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', flexShrink: 0, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.25))' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={selectedSign.image || `/images/zodiac/${selectedSign.id}.png`}
+                      alt={selectedSign.sign}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  </div>
                   <div>
                     <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-primary)' }}>
                       {selectedSign.sign} {selectedSign.latinName || ''}

@@ -9,7 +9,15 @@ interface AdBannerProps {
   targetUrl?: string;
   margin?: string;
   maxHeight?: string;
-  position?: 'header-top' | 'hero-side' | 'mid-content-1' | 'mid-content-2' | 'sidebar-widget' | 'footer-top';
+  position?:
+    | 'header-top'
+    | 'hero-side'
+    | 'mid-content-1'
+    | 'mid-content-2'
+    | 'sidebar-widget'
+    | 'single-news-sidebar'
+    | 'rashifal-top'
+    | 'footer-top';
 }
 
 export default function AdBanner({
@@ -48,22 +56,38 @@ export default function AdBanner({
         width: '100%',
       }}
     >
+      {/* Top Advertisement Tag Bar */}
       <div
         style={{
-          position: 'absolute',
-          top: '6px',
-          right: '8px',
-          backgroundColor: 'rgba(0, 0, 0, 0.65)',
-          color: '#FFFFFF',
-          fontSize: '0.68rem',
-          fontWeight: 700,
-          padding: '2px 6px',
-          borderRadius: '4px',
-          letterSpacing: '0.5px',
-          zIndex: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '4px 12px',
+          backgroundColor: 'var(--bg-main)',
+          borderBottom: '1px solid var(--border-color)',
+          fontSize: '0.72rem',
+          fontWeight: 800,
+          color: 'var(--text-muted)',
+          letterSpacing: '0.3px',
         }}
       >
-        विज्ञापन / AD
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          📢 विज्ञापन
+        </span>
+        {position && (
+          <span
+            style={{
+              fontSize: '0.65rem',
+              backgroundColor: 'var(--border-color)',
+              color: 'var(--text-primary)',
+              padding: '1px 6px',
+              borderRadius: '4px',
+              fontWeight: 700,
+            }}
+          >
+            {position}
+          </span>
+        )}
       </div>
 
       <a href={activeTarget} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none' }}>

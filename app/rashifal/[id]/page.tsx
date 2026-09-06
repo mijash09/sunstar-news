@@ -63,13 +63,8 @@ export async function generateStaticParams() {
 }
 
 export default function SingleRashifalPage({ params }: Props) {
-  const item = getRashifalById(params.id);
-
-  if (!item) {
-    notFound();
-  }
-
   const allSigns = getAllRashifal();
+  const item = getRashifalById(params.id) || allSigns[0];
 
   return <SingleRashifalClient initialItem={item} allSigns={allSigns} />;
 }

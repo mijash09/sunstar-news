@@ -44,6 +44,95 @@
     --font-latin: 'Poppins', sans-serif;
 }
 
+/* ==========================================================================
+   TIPTAP RICH EDITOR & ARTICLE CALLOUT BOX STYLES (Matching Image Layout)
+   ========================================================================== */
+.tiptap-editor-content,
+.single-article-content {
+  font-family: var(--font-nepali);
+  line-height: 1.85;
+}
+
+.tiptap-editor-content p,
+.single-article-content p {
+  margin-bottom: 1.2rem;
+  font-size: 1.08rem;
+  color: var(--text-primary);
+}
+
+.tiptap-editor-content blockquote,
+.single-article-content blockquote {
+  margin: 20px 0;
+  padding: 16px 20px;
+  background-color: #FFF5EE;
+  border-left: 4px solid var(--brand-orange);
+  border-radius: 6px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+[data-theme="dark"] .tiptap-editor-content blockquote,
+[data-theme="dark"] .single-article-content blockquote {
+  background-color: #2D1A10;
+  border-left-color: var(--brand-orange);
+  color: #F8FAFC;
+}
+
+/* 1-Click Alert Box Styles */
+.news-callout {
+  padding: 18px 22px !important;
+  margin: 22px 0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  line-height: 1.7 !important;
+}
+
+.news-callout-warning {
+  background-color: #FFF5EE !important;
+  border-left: 5px solid var(--brand-orange) !important;
+  color: #1E293B !important;
+  font-weight: 700 !important;
+  font-size: 1.08rem !important;
+}
+
+.news-callout-info {
+  background-color: #F0F9FF !important;
+  border-left: 5px solid #0284C7 !important;
+  color: #0369A1 !important;
+}
+
+.news-callout-highlight {
+  background-color: #FEF3C7 !important;
+  border-left: 5px solid #D97706 !important;
+  color: #78350F !important;
+}
+
+.news-callout-editorial {
+  background-color: #F8FAFC !important;
+  border-left: 5px solid #475569 !important;
+  color: #334155 !important;
+}
+
+[data-theme="dark"] .news-callout-warning {
+  background-color: #2D1A10 !important;
+  color: #F8FAFC !important;
+}
+[data-theme="dark"] .news-callout-info {
+  background-color: #0C4A6E !important;
+  color: #F0F9FF !important;
+}
+[data-theme="dark"] .news-callout-highlight {
+  background-color: #451A03 !important;
+  color: #FEF3C7 !important;
+}
+[data-theme="dark"] .news-callout-editorial {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
 [data-theme="dark"] {
     --bg-main: #0F172A;
     --bg-card: #1E293B;
@@ -4532,7 +4621,351 @@ button {
     border: 1px solid rgba(249, 115, 22, 0.3);
 }
 
+/* shadcn Data Tables */
+.shadcn-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
 
+.shadcn-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.88rem;
+}
 
+.shadcn-table th {
+    padding: 12px 16px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background-color: var(--bg-alt);
+    border-bottom: 1px solid var(--border-color);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+}
 
+.shadcn-table td {
+    padding: 14px 16px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
 
+.shadcn-table tr:last-child td {
+    border-bottom: none;
+}
+
+.shadcn-table tr:hover td {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* shadcn Pagination */
+.shadcn-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.shadcn-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.shadcn-page-btn {
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.shadcn-page-btn:hover:not(:disabled) {
+    background-color: var(--bg-alt);
+    border-color: var(--brand-blue);
+}
+
+.shadcn-page-btn.active {
+    background-color: var(--brand-blue);
+    color: #ffffff;
+    border-color: var(--brand-blue);
+}
+
+.shadcn-page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* shadcn Accordion & Sidebar */
+.shadcn-sidebar {
+    width: 280px;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.shadcn-sidebar-group {
+    margin-bottom: 16px;
+}
+
+.shadcn-sidebar-label {
+    padding: 8px 16px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.shadcn-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+.shadcn-sidebar-item:hover {
+    background-color: var(--bg-alt);
+    color: var(--text-primary);
+}
+
+.shadcn-sidebar-item.active {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--brand-blue);
+    border-left: 3px solid var(--brand-blue);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.shadcn-accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    font-weight: 800;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+/* shadcn Modal & Dialog */
+.shadcn-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.shadcn-modal {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: shadcnModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes shadcnModalFadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.shadcn-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.shadcn-modal-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.shadcn-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.shadcn-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    background-color: var(--bg-alt);
+}
+
+/* shadcn Markdown Editor */
+.shadcn-md-editor {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--bg-card);
+}
+
+.shadcn-md-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background-color: var(--bg-alt);
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.shadcn-md-btn {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.shadcn-md-btn:hover {
+    background-color: var(--bg-alt);
+    border-color: var(--brand-blue);
+}
+
+.shadcn-md-preview-toggle {
+    margin-left: auto;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.shadcn-md-textarea {
+    width: 100%;
+    min-height: 220px;
+    padding: 14px;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+    resize: vertical;
+}
+
+.shadcn-md-preview {
+    min-height: 220px;
+    padding: 16px;
+    background-color: var(--bg-alt);
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text-primary);
+    overflow-y: auto;
+}
+
+/* Dashboard Mobile Responsiveness Styles */
+.shadcn-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 99;
+}
+
+@media (max-width: 991px) {
+    .shadcn-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh !important;
+        z-index: 100 !important;
+        transform: translateX(-100%);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .shadcn-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .dashboard-preview-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-header {
+        padding: 0 14px !important;
+    }
+
+    .dashboard-main-content {
+        padding: 16px 12px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .shadcn-card {
+        padding: 16px !important;
+    }
+
+    .shadcn-modal {
+        max-height: 94vh;
+        border-radius: var(--radius-md);
+        margin: 10px;
+    }
+
+    .shadcn-modal-header,
+    .shadcn-modal-body,
+    .shadcn-modal-footer {
+        padding: 14px 16px !important;
+    }
+
+    .shadcn-table th,
+    .shadcn-table td {
+        padding: 10px 12px !important;
+        font-size: 0.8rem !important;
+    }
+}
