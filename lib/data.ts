@@ -85,6 +85,16 @@ export interface PollData {
   options: PollOption[];
 }
 
+export interface BannerAd {
+  id: string;
+  title: string;
+  imageUrl: string;
+  targetUrl: string;
+  position: 'header-top' | 'hero-side' | 'mid-content-1' | 'mid-content-2' | 'sidebar-widget' | 'footer-top';
+  isActive: boolean;
+  clicksCount?: number;
+}
+
 export const SUNSTAR_DATA = {
   sourceInfo: {
     name: "सनस्टार न्युज",
@@ -160,6 +170,63 @@ export const SUNSTAR_DATA = {
     condition: "सफा / सुहाउँदो मौसम",
     aqi: "५२ (मध्यम)",
   },
+
+  banners: [
+    {
+      id: 'banner-header-1',
+      title: 'Header Main Leaderboard Ad Banner (728x90)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'header-top',
+      isActive: true,
+      clicksCount: 1420,
+    },
+    {
+      id: 'banner-hero-side-1',
+      title: 'Hero Right Sidebar Banner (300x250)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/nmb-bank-300x250.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'hero-side',
+      isActive: true,
+      clicksCount: 890,
+    },
+    {
+      id: 'banner-mid-1',
+      title: 'Mid Content Banner 1 (Exclusive/Lead After)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'mid-content-1',
+      isActive: true,
+      clicksCount: 654,
+    },
+    {
+      id: 'banner-mid-2',
+      title: 'Mid Content Banner 2 (Pradesh After)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'mid-content-2',
+      isActive: true,
+      clicksCount: 432,
+    },
+    {
+      id: 'banner-sidebar-1',
+      title: 'Right Sidebar Sticky Square Banner (300x250)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/nmb-bank-300x250.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'sidebar-widget',
+      isActive: true,
+      clicksCount: 310,
+    },
+    {
+      id: 'banner-footer-1',
+      title: 'Footer Top Leaderboard Banner',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'footer-top',
+      isActive: true,
+      clicksCount: 205,
+    },
+  ] as BannerAd[],
 
   rashifalDate: "१५ भाद्र २०८३ (आजको दैनिक राशिफल)",
   rashifal: [

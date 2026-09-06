@@ -1,21 +1,38 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import SUNSTAR_DATA from '@/lib/data';
 
 interface AdBannerProps {
   imageUrl?: string;
   altText?: string;
+  targetUrl?: string;
   margin?: string;
   maxHeight?: string;
+  position?: 'header-top' | 'hero-side' | 'mid-content-1' | 'mid-content-2' | 'sidebar-widget' | 'footer-top';
 }
 
 export default function AdBanner({
-  imageUrl = 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+  imageUrl,
   altText = 'सनस्टार डिजिटल विज्ञापन (Sunstar Digital Ad Network)',
+  targetUrl = '#',
   margin = '20px 0',
   maxHeight = '140px',
+  position,
 }: AdBannerProps) {
+  let activeImage = imageUrl || 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg';
+  let activeTarget = targetUrl;
+  let activeTitle = altText;
+
+  if (position && Array.isArray(SUNSTAR_DATA.banners)) {
+    const found = SUNSTAR_DATA.banners.find((b) => b.position === position && b.isActive);
+    if (found) {
+      activeImage = found.imageUrl || activeImage;
+      activeTarget = found.targetUrl || activeTarget;
+      activeTitle = found.title || activeTitle;
+    }
+  }
+
   return (
     <div
       className="ad-banner-block"
@@ -49,11 +66,11 @@ export default function AdBanner({
         विज्ञापन / AD
       </div>
 
-      <Link href="/login" style={{ display: 'block', textDecoration: 'none' }}>
+      <a href={activeTarget} target="_blank" rel="noopener noreferrer" style={{ display: 'block', textDecoration: 'none' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={imageUrl}
-          alt={altText}
+          src={activeImage}
+          alt={activeTitle}
           style={{
             width: '100%',
             maxHeight,
@@ -61,7 +78,7 @@ export default function AdBanner({
             display: 'block',
           }}
         />
-      </Link>
+      </a>
     </div>
   );
 }
