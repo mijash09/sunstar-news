@@ -24,22 +24,7 @@ export default function RashifalSection() {
   return (
     <div id="rashifal" className="rashifal-section-block" style={{ marginBottom: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <SectionHeader title="🔮 दैनिक राशिफल (Daily Horoscope)" viewAllHref="#rashifal" viewAllText="आजको राशिफल ➔" />
-        {isLive && (
-          <span
-            style={{
-              backgroundColor: 'rgba(229, 9, 20, 0.1)',
-              color: 'var(--brand-red)',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              padding: '4px 10px',
-              borderRadius: '12px',
-              border: '1px solid rgba(229, 9, 20, 0.2)',
-            }}
-          >
-            🔴 हाम्रो पात्रो live
-          </span>
-        )}
+        <SectionHeader title="🔮 दैनिक राशिफल (Daily Horoscope)" viewAllHref="/rashifal" viewAllText="सबै राशिफल (दैनिक, साप्ताहिक, मासिक, वार्षिक) ➔" />
       </div>
 
       <div
@@ -238,7 +223,7 @@ export default function RashifalSection() {
 
             <div style={{ marginBottom: '20px' }}>
               <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--brand-blue)', marginBottom: '6px' }}>
-                आजको दैनिक राशिफल (हाम्रो पात्रो)
+                आजको दैनिक राशिफल
               </h4>
               <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
                 {(selectedSign as any).prediction}

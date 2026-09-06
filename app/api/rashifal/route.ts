@@ -1,17 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 import SUNSTAR_DATA, { RashifalItem } from '@/lib/data';
 
-export const revalidate = 3600; // Cache Hamro Patro response for 1 hour
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Cache response for 1 hour
 
 interface HamroPrediction {
   sunsign: string;
   prediction: string;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const res = await fetch('https://www.hamropatro.com/rashifal', {
+    const { searchParams } = new URL(request.url);
+    const type = (searchParams.get('type') || 'daily').toLowerCase();
+
+    let targetUrl = 'https://www.hamropatro.com/rashifal';
+    if (type === 'weekly') {
+      targetUrl = 'https://www.hamropatro.com/rashifal/weekly';
+    } else if (type === 'monthly') {
+      targetUrl = 'https://www.hamropatro.com/rashifal/monthly';
+    } else if (type === 'yearly') {
+      targetUrl = 'https://www.hamropatro.com/rashifal/yearly';
+    }
+
+    const res = await fetch(targetUrl, {
       headers: {
         'User-Agent':
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -57,7 +70,7 @@ export async function GET() {
         let parentBox = signNode.parent();
         for (let i = 0; i < 5; i++) {
           if (
-            parentBox.find('p, span').filter((_: any, p: any) => $(p).text().trim().length > 40).length > 0
+            parentBox.find('p, span').filter((_: any, p: any) => $(p).text().trim().length > 30).length > 0
           ) {
             break;
           }
@@ -69,7 +82,7 @@ export async function GET() {
           .filter((_: any, el: any) => {
             const txt = $(el).text().trim();
             return (
-              txt.length > 40 &&
+              txt.length > 30 &&
               !txt.startsWith(sign) &&
               !txt.includes('चु, चे') &&
               !txt.includes('इ, उ, ए')
@@ -119,7 +132,8 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      source: 'Hamro Patro (हाम्रो पात्रो)',
+      type,
+      source: 'Hamro Patro',
       timestamp: new Date().toISOString(),
       predictions: mergedRashifal,
     });
