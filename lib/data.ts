@@ -1393,4 +1393,14 @@ export function getArticleById(id: string): Article | undefined {
   return articles.find((a) => a.id === id);
 }
 
+export function getAllRashifal(): RashifalItem[] {
+  return SUNSTAR_DATA.rashifal || [];
+}
+
+export function getRashifalById(id: string): RashifalItem | undefined {
+  const list = getAllRashifal();
+  return list.find((r) => r.id.toLowerCase() === id.toLowerCase() || r.sign.toLowerCase() === id.toLowerCase());
+}
+
 export default SUNSTAR_DATA;
+

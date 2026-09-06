@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Header from '@/components/organisms/Header';
 import Navigation from '@/components/organisms/Navigation';
 import Footer from '@/components/organisms/Footer';
@@ -291,9 +292,13 @@ export default function RashifalPage() {
                       alignItems: 'center',
                     }}
                   >
-                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--brand-blue)' }}>
-                      पूरा भविष्यफल हेर्नुहोस् ➔
-                    </span>
+                    <Link
+                      href={`/rashifal/${item.id}`}
+                      style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--brand-blue)', textDecoration: 'none' }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      विस्तृत राशिफल र प्रतिक्रिया ➔
+                    </Link>
                     <span style={{ fontSize: '1.2rem' }}>🔮</span>
                   </div>
                 </div>
