@@ -3,6 +3,7 @@ export interface Article {
   title: string;
   slug?: string;
   category: string;
+  categories?: string[];
   categorySlug?: string;
   author?: string;
   authorRole?: string;
@@ -60,6 +61,18 @@ export interface StoryItem {
   articleId?: string;
 }
 
+export interface RashifalItem {
+  id: string;
+  sign: string;
+  latinName: string;
+  symbol: string;
+  image?: string;
+  dateRange?: string;
+  luckyColor?: string;
+  luckyNumber?: string;
+  prediction: string;
+}
+
 export interface PollOption {
   id: string;
   label: string;
@@ -72,6 +85,24 @@ export interface PollData {
   question: string;
   totalVotes: number;
   options: PollOption[];
+}
+
+export interface BannerAd {
+  id: string;
+  title: string;
+  imageUrl: string;
+  targetUrl: string;
+  position:
+    | 'header-top'
+    | 'hero-side'
+    | 'mid-content-1'
+    | 'mid-content-2'
+    | 'sidebar-widget'
+    | 'single-news-sidebar'
+    | 'rashifal-top'
+    | 'footer-top';
+  isActive: boolean;
+  clicksCount?: number;
 }
 
 export const SUNSTAR_DATA = {
@@ -150,6 +181,63 @@ export const SUNSTAR_DATA = {
     aqi: "५२ (मध्यम)",
   },
 
+  banners: [
+    {
+      id: 'banner-header-1',
+      title: 'Header Main Leaderboard Ad Banner (728x90)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'header-top',
+      isActive: true,
+      clicksCount: 1420,
+    },
+    {
+      id: 'banner-hero-side-1',
+      title: 'Hero Right Sidebar Banner (300x250)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/nmb-bank-300x250.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'hero-side',
+      isActive: true,
+      clicksCount: 890,
+    },
+    {
+      id: 'banner-mid-1',
+      title: 'Mid Content Banner 1 (Exclusive/Lead After)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'mid-content-1',
+      isActive: true,
+      clicksCount: 654,
+    },
+    {
+      id: 'banner-mid-2',
+      title: 'Mid Content Banner 2 (Pradesh After)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'mid-content-2',
+      isActive: true,
+      clicksCount: 432,
+    },
+    {
+      id: 'banner-sidebar-1',
+      title: 'Right Sidebar Sticky Square Banner (300x250)',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/nmb-bank-300x250.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'sidebar-widget',
+      isActive: true,
+      clicksCount: 310,
+    },
+    {
+      id: 'banner-footer-1',
+      title: 'Footer Top Leaderboard Banner',
+      imageUrl: 'https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'footer-top',
+      isActive: true,
+      clicksCount: 205,
+    },
+  ] as BannerAd[],
+
   rashifalDate: "१५ भाद्र २०८३ (आजको दैनिक राशिफल)",
   rashifal: [
     {
@@ -157,6 +245,7 @@ export const SUNSTAR_DATA = {
       sign: "मेष",
       latinName: "Aries",
       symbol: "♈",
+      image: "/images/zodiac/mesh.png",
       dateRange: "चैत १५ - वैशाख १५",
       luckyColor: "रातो",
       luckyNumber: "९",
@@ -167,6 +256,7 @@ export const SUNSTAR_DATA = {
       sign: "वृष",
       latinName: "Taurus",
       symbol: "♉",
+      image: "/images/zodiac/vrish.png",
       dateRange: "वैशाख १६ - जेठ १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -177,6 +267,7 @@ export const SUNSTAR_DATA = {
       sign: "मिथुन",
       latinName: "Gemini",
       symbol: "♊",
+      image: "/images/zodiac/mithun.png",
       dateRange: "जेठ १६ - असार १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -187,6 +278,7 @@ export const SUNSTAR_DATA = {
       sign: "कर्कट",
       latinName: "Cancer",
       symbol: "♋",
+      image: "/images/zodiac/karkat.png",
       dateRange: "असार १६ - साउन १५",
       luckyColor: "गुलाबी",
       luckyNumber: "२",
@@ -197,6 +289,7 @@ export const SUNSTAR_DATA = {
       sign: "सिंह",
       latinName: "Leo",
       symbol: "♌",
+      image: "/images/zodiac/simha.png",
       dateRange: "साउन १६ - भदौ १५",
       luckyColor: "पहेंलो",
       luckyNumber: "१",
@@ -207,6 +300,7 @@ export const SUNSTAR_DATA = {
       sign: "कन्या",
       latinName: "Virgo",
       symbol: "♍",
+      image: "/images/zodiac/kanya.png",
       dateRange: "भदौ १६ - असोज १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -217,6 +311,7 @@ export const SUNSTAR_DATA = {
       sign: "तुला",
       latinName: "Libra",
       symbol: "♎",
+      image: "/images/zodiac/tula.png",
       dateRange: "असोज १६ - कात्तिक १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -227,6 +322,7 @@ export const SUNSTAR_DATA = {
       sign: "वृश्चिक",
       latinName: "Scorpio",
       symbol: "♏",
+      image: "/images/zodiac/vrischik.png",
       dateRange: "कात्तिक १६ - मंसीर १५",
       luckyColor: "रातो",
       luckyNumber: "९",
@@ -237,6 +333,7 @@ export const SUNSTAR_DATA = {
       sign: "धनु",
       latinName: "Sagittarius",
       symbol: "♐",
+      image: "/images/zodiac/dhanu.png",
       dateRange: "मंसीर १६ - पुस १५",
       luckyColor: "पहेंलो",
       luckyNumber: "३",
@@ -247,6 +344,7 @@ export const SUNSTAR_DATA = {
       sign: "मकर",
       latinName: "Capricorn",
       symbol: "♑",
+      image: "/images/zodiac/makar.png",
       dateRange: "पुस १६ - माघ १५",
       luckyColor: "नीलो",
       luckyNumber: "८",
@@ -257,6 +355,7 @@ export const SUNSTAR_DATA = {
       sign: "कुम्भ",
       latinName: "Aquarius",
       symbol: "♒",
+      image: "/images/zodiac/kumbha.png",
       dateRange: "माघ १६ - फागुन १५",
       luckyColor: "नीलो",
       luckyNumber: "८",
@@ -267,6 +366,7 @@ export const SUNSTAR_DATA = {
       sign: "मीन",
       latinName: "Pisces",
       symbol: "♓",
+      image: "/images/zodiac/meen.png",
       dateRange: "फागुन १६ - चैत १४",
       luckyColor: "पहेंलो",
       luckyNumber: "३",
@@ -1315,4 +1415,14 @@ export function getArticleById(id: string): Article | undefined {
   return articles.find((a) => a.id === id);
 }
 
+export function getAllRashifal(): RashifalItem[] {
+  return SUNSTAR_DATA.rashifal || [];
+}
+
+export function getRashifalById(id: string): RashifalItem | undefined {
+  const list = getAllRashifal();
+  return list.find((r) => r.id.toLowerCase() === id.toLowerCase() || r.sign.toLowerCase() === id.toLowerCase());
+}
+
 export default SUNSTAR_DATA;
+

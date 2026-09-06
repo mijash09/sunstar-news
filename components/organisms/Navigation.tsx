@@ -15,6 +15,7 @@ const navItems = [
   { label: 'फिचर', href: '/category/feature' },
   { label: 'प्रविधि', href: '/category/technology' },
   { label: 'विश्व', href: '/category/world' },
+  { label: '🔮 राशिफल', href: '/rashifal' },
 ];
 
 export default function Navigation({

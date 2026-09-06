@@ -1,24 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SUNSTAR_DATA from '@/lib/data';
 import SectionHeader from '@/components/molecules/SectionHeader';
 
 export default function RashifalSection() {
-  const [selectedSign, setSelectedSign] = useState<any>(null);
+  const [selectedSign, setSelectedSign] = useState(null);
+  const [rashifalList, setRashifalList] = useState(SUNSTAR_DATA.rashifal || []);
+  const [isLive, setIsLive] = useState(false);
 
-  const rashifalList = SUNSTAR_DATA.rashifal || [];
+  useEffect(() => {
+    fetch('/api/rashifal')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.predictions) && data.predictions.length > 0) {
+          setRashifalList(data.predictions);
+          setIsLive(true);
+        }
+      })
+      .catch((err) => console.warn('Live rashifal fallback:', err));
+  }, []);
 
   return (
-    <section id="rashifal" className="rashifal-section-block" style={{ marginBottom: '24px' }}>
-      <SectionHeader title="🔮 दैनिक राशिफल (Daily Horoscope)" viewAllHref="#rashifal" viewAllText="आजको राशिफल ➔" />
+    <div id="rashifal" className="rashifal-section-block" style={{ marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <SectionHeader title="🔮 दैनिक राशिफल (Daily Horoscope)" viewAllHref="/rashifal" viewAllText="सबै राशिफल (दैनिक, साप्ताहिक, मासिक, वार्षिक) ➔" />
+      </div>
 
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
           gap: '14px',
-          marginTop: '16px',
         }}
       >
         {rashifalList.map((item: any) => (
@@ -34,20 +47,16 @@ export default function RashifalSection() {
               cursor: 'pointer',
               boxShadow: 'var(--shadow-sm)',
               transition: 'all 0.25s ease',
-              position: 'relative',
-              overflow: 'hidden',
             }}
             className="rashifal-card-item"
           >
-            <div
-              style={{
-                fontSize: '2rem',
-                lineHeight: 1,
-                marginBottom: '8px',
-                color: 'var(--brand-orange)',
-              }}
-            >
-              {item.symbol}
+            <div style={{ marginBottom: '8px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.image || `/images/zodiac/${item.id}.png`}
+                alt={item.sign}
+                style={{ width: '54px', height: '54px', margin: '0 auto', display: 'block', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
+              />
             </div>
             <h3
               style={{
@@ -108,9 +117,7 @@ export default function RashifalSection() {
                 fontSize: '0.82rem',
                 color: 'var(--text-secondary)',
                 lineHeight: 1.45,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
+                height: '2.9em',
                 overflow: 'hidden',
               }}
             >
@@ -122,8 +129,8 @@ export default function RashifalSection() {
                 display: 'inline-block',
                 marginTop: '8px',
                 fontSize: '0.75rem',
-                fontWeight: 700,
-                color: 'var(--brand-orange)',
+                fontWeight: 800,
+                color: 'var(--brand-blue)',
               }}
             >
               विस्तृत पढ्नुहोस् ➔
@@ -132,7 +139,6 @@ export default function RashifalSection() {
         ))}
       </div>
 
-      {/* Rashifal Detail Modal */}
       {selectedSign && (
         <div
           style={{
@@ -144,91 +150,108 @@ export default function RashifalSection() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '16px',
+            padding: '20px',
           }}
           onClick={() => setSelectedSign(null)}
         >
           <div
             style={{
               backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-lg)',
+              padding: '28px',
               maxWidth: '480px',
               width: '100%',
-              padding: '24px',
               boxShadow: 'var(--shadow-lg)',
-              position: 'relative',
+              border: '1px solid var(--border-color)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setSelectedSign(null)}
+            <div
               style={{
-                position: 'absolute',
-                top: '14px',
-                right: '16px',
-                fontSize: '1.2rem',
-                fontWeight: 800,
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px',
               }}
             >
-              ✕
-            </button>
-
-            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-              <span style={{ fontSize: '3rem', color: 'var(--brand-orange)' }}>{selectedSign.symbol}</span>
-              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
-                {selectedSign.sign} ({selectedSign.latinName})
-              </h2>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{SUNSTAR_DATA.rashifalDate}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', flexShrink: 0, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={(selectedSign as any).image || `/images/zodiac/${(selectedSign as any).id}.png`}
+                    alt={(selectedSign as any).sign}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {(selectedSign as any).sign} ({(selectedSign as any).latinName})
+                  </h2>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {(selectedSign as any).dateRange}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedSign(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.4rem',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                ✕
+              </button>
             </div>
 
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'center',
                 gap: '12px',
-                margin: '14px 0',
-                fontSize: '0.85rem',
-                fontWeight: 700,
+                marginBottom: '16px',
+                padding: '10px 14px',
+                backgroundColor: 'var(--bg-alt)',
+                borderRadius: '8px',
               }}
             >
-              <span style={{ backgroundColor: 'rgba(255, 85, 0, 0.1)', color: 'var(--brand-orange)', padding: '4px 12px', borderRadius: '6px' }}>
-                🎨 शुभ रंग: {selectedSign.luckyColor}
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                🎨 शुभ रंग: <strong>{(selectedSign as any).luckyColor}</strong>
               </span>
-              <span style={{ backgroundColor: 'rgba(11, 34, 64, 0.08)', color: 'var(--brand-blue)', padding: '4px 12px', borderRadius: '6px' }}>
-                🔢 शुभ अंक: {selectedSign.luckyNumber}
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                🔢 शुभ अंक: <strong>{(selectedSign as any).luckyNumber}</strong>
               </span>
             </div>
 
-            <div style={{ padding: '16px', backgroundColor: 'var(--bg-alt)', borderRadius: 'var(--radius-md)', margin: '16px 0' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--brand-blue)', marginBottom: '6px' }}>
-                📖 दैनिक फल (Daily Prediction):
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--brand-blue)', marginBottom: '6px' }}>
+                आजको दैनिक राशिफल
               </h4>
-              <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>{selectedSign.prediction}</p>
+              <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                {(selectedSign as any).prediction}
+              </p>
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <div style={{ textAlign: 'right' }}>
               <button
                 onClick={() => setSelectedSign(null)}
                 style={{
-                  backgroundColor: 'var(--brand-orange)',
-                  color: '#FFFFFF',
+                  padding: '8px 20px',
+                  backgroundColor: 'var(--brand-blue)',
+                  color: '#ffffff',
                   border: 'none',
-                  padding: '8px 24px',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 800,
-                  fontSize: '0.9rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >
-                बन्द गर्नुहोस् ✕
+                बन्द गर्नुहोस्
               </button>
             </div>
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
