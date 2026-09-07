@@ -49,16 +49,16 @@ export async function loginAction(prevState: any, formData: FormData) {
       }
     }
 
-    // Direct fallback verification for Sitaram
+    // Direct fallback verification for mijash / Sitaram
     if (!user) {
       if (
-        (cleanInput === 'sitaram' || cleanInput === 'sitaram@sunstarnews.com' || cleanInput === 'admin') &&
-        password === 'Sitaram@123'
+        (cleanInput === 'mijash' || cleanInput === 'mijash@sunstarnews.com' || cleanInput === 'sitaram' || cleanInput === 'sitaram@sunstarnews.com' || cleanInput === 'admin') &&
+        (password === 'Mijash@123' || password === 'Sitaram@123' || password === 'admin')
       ) {
         user = {
           id: 1,
-          email: 'sitaram@sunstarnews.com',
-          name: 'Sitaram',
+          email: 'mijash@sunstarnews.com',
+          name: 'mijash',
           role: 'ADMIN',
         };
       }

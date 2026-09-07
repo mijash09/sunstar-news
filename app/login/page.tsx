@@ -9,8 +9,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState('Sitaram');
-  const [password, setPassword] = useState('Sitaram@123');
+  const [username, setUsername] = useState('mijash');
+  const [password, setPassword] = useState('Mijash@123');
   const [selectedRole, setSelectedRole] = useState<'ADMIN' | 'EDITOR'>('ADMIN');
 
   const executeDummyLogin = (loginUser: string, role: 'ADMIN' | 'EDITOR') => {
@@ -57,7 +57,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    executeDummyLogin(username || 'Sitaram', selectedRole);
+    executeDummyLogin(username || 'mijash', selectedRole);
   };
 
   const handleQuickLogin = (demoName: string, role: 'ADMIN' | 'EDITOR', demoPass: string) => {
@@ -202,9 +202,9 @@ export default function LoginPage() {
                 type="button"
                 className="shadcn-btn"
                 style={{ width: '100%', fontSize: '0.82rem', fontWeight: 700, padding: '7px 10px', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#2563eb', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '6px', cursor: 'pointer', textAlign: 'center' }}
-                onClick={() => handleQuickLogin('Sitaram', 'ADMIN', 'Sitaram@123')}
+                onClick={() => handleQuickLogin('mijash', 'ADMIN', 'Mijash@123')}
               >
-                ⚡ Sitaram (Admin) खाताबाट लगइन गर्नुहोस्
+                ⚡ mijash (Admin) खाताबाट लगइन गर्नुहोस्
               </button>
               <button
                 type="button"

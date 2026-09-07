@@ -84,12 +84,12 @@ export async function initDatabase() {
       );
     `;
 
-    // 6. Seed Default Sitaram Admin User
-    const sitaramPass = await bcrypt.hash('Sitaram@123', 10);
+    // 6. Seed Default Mijash Admin User
+    const mijashPass = await bcrypt.hash('Mijash@123', 10);
     await sql`
       INSERT INTO users (username, email, name, password_hash, role)
-      VALUES ('Sitaram', 'sitaram@sunstarnews.com', 'Sitaram', ${sitaramPass}, 'ADMIN')
-      ON CONFLICT (email) DO UPDATE SET password_hash = ${sitaramPass}, username = 'Sitaram';
+      VALUES ('mijash', 'mijash@sunstarnews.com', 'mijash', ${mijashPass}, 'ADMIN')
+      ON CONFLICT (email) DO UPDATE SET password_hash = ${mijashPass}, username = 'mijash';
     `;
 
     // 7. Seed Backup Admin User
