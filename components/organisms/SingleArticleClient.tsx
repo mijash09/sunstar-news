@@ -7,17 +7,18 @@ import Navigation from '@/components/organisms/Navigation';
 import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
 import AdBanner from '@/components/molecules/AdBanner';
+import SocialShareBar from '@/components/molecules/SocialShareBar';
 import RashifalSection from '@/components/organisms/RashifalSection';
-import SUNSTAR_DATA, { Article } from '@/lib/data';
+import SUNSTAR_DATA, { Article, CommentItem } from '@/lib/data';
 import { useRouter } from 'next/navigation';
 
 interface Comment {
   id: string;
   name: string;
-  avatar: string;
+  avatar?: string;
   time: string;
   text: string;
-  likes: number;
+  likes?: number;
 }
 
 interface Props {
@@ -48,12 +49,15 @@ const INITIAL_COMMENTS: Comment[] = [
 export default function SingleArticleClient({ article, relatedArticles, trendingArticles }: Props) {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [likesCount, setLikesCount] = useState(48);
+  const [likesCount, setLikesCount] = useState(article.likesCount ?? 48);
   const [userLiked, setUserLiked] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
   // Comments State
-  const [comments, setComments] = useState<Comment[]>(INITIAL_COMMENTS);
+  const initialArticleComments: Comment[] = Array.isArray(article.commentsList) && article.commentsList.length > 0
+    ? article.commentsList
+    : INITIAL_COMMENTS;
+  const [comments, setComments] = useState<Comment[]>(initialArticleComments);
   const [authorName, setAuthorName] = useState('');
   const [commentText, setCommentText] = useState('');
   const [commentNotice, setCommentNotice] = useState<string | null>(null);
@@ -62,14 +66,23 @@ export default function SingleArticleClient({ article, relatedArticles, trending
   const [pollVoted, setPollVoted] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
-  function handleLikeToggle() {
-    if (userLiked) {
-      setLikesCount(likesCount - 1);
-      setUserLiked(false);
-    } else {
-      setLikesCount(likesCount + 1);
-      setUserLiked(true);
-    }
+  // Multi Image Gallery State
+  const displayImages: string[] = Array.isArray(article.images) && article.images.length > 0
+    ? article.images
+    : (article.image ? [article.image] : []);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  async function handleLikeToggle() {
+    const nextLiked = !userLiked;
+    setUserLiked(nextLiked);
+    setLikesCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+    try {
+      await fetch('/api/dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'toggle-like', articleId: article.id, increment: nextLiked }),
+      });
+    } catch (e) {}
   }
 
   function handleCopyLink() {
@@ -80,7 +93,7 @@ export default function SingleArticleClient({ article, relatedArticles, trending
     }
   }
 
-  function handleAddComment(e: React.FormEvent) {
+  async function handleAddComment(e: React.FormEvent) {
     e.preventDefault();
     if (!commentText.trim() || !authorName.trim()) {
       setCommentNotice('⚠️ कृपया आफ्नो नाम र प्रतिक्रिया लेख्नुहोस्।');
@@ -97,9 +110,24 @@ export default function SingleArticleClient({ article, relatedArticles, trending
     };
 
     setComments([newComment, ...comments]);
+    const textToSend = commentText.trim();
+    const nameToSend = authorName.trim();
     setCommentText('');
     setCommentNotice('✅ तपाईंको प्रतिक्रिया सफलताका साथ प्रकाशित भयो!');
     setTimeout(() => setCommentNotice(null), 4000);
+
+    try {
+      await fetch('/api/dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add-comment',
+          articleId: article.id,
+          name: nameToSend,
+          text: textToSend,
+        }),
+      });
+    } catch (e) {}
   }
 
   return (
@@ -198,55 +226,173 @@ export default function SingleArticleClient({ article, relatedArticles, trending
               </div>
             </div>
 
-            {/* Social Share Bar */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                marginBottom: '24px',
-                paddingBottom: '16px',
-                borderBottom: '1px dashed var(--border-color)',
-                flexWrap: 'wrap',
-              }}
-            >
-              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-muted)' }}>सेयर गर्नुहोस्:</span>
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=https://sunstarnews.com/news/${article.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shadcn-btn"
-                style={{ backgroundColor: '#1877F2', color: '#ffffff', padding: '6px 14px', fontSize: '0.78rem', border: 'none' }}
-              >
-                📘 Facebook
-              </a>
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=https://sunstarnews.com/news/${article.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shadcn-btn"
-                style={{ backgroundColor: '#000000', color: '#ffffff', padding: '6px 14px', fontSize: '0.78rem', border: 'none' }}
-              >
-                🐦 Twitter/X
-              </a>
-              <button
-                onClick={handleCopyLink}
-                className="shadcn-btn shadcn-btn-outline"
-                style={{ padding: '6px 14px', fontSize: '0.78rem' }}
-              >
-                {copySuccess ? '✅ लिङ्क कपी भयो!' : '🔗 लिङ्क कपी गर्नुहोस्'}
-              </button>
-            </div>
+            {/* Executive Social Share Bar */}
+            <SocialShareBar
+              title={article.title}
+              url={`https://sunstarnews.com/news/${article.id}`}
+            />
 
-            {/* Cover Image & Caption */}
-            {article.image && (
+            {/* Sliding Cover Image Carousel */}
+            {displayImages.length > 0 && (
               <div style={{ marginBottom: '28px' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  style={{ width: '100%', maxHeight: '480px', objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
-                />
+                <div
+                  style={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: '#050505',
+                  }}
+                >
+                  {/* Sliding Track */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      transform: `translateX(-${selectedImageIndex * 100}%)`,
+                      transition: 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)',
+                      width: '100%',
+                    }}
+                  >
+                    {displayImages.map((imgUrl, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          flex: '0 0 100%',
+                          minWidth: '100%',
+                          maxHeight: '520px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#0a0a0a',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imgUrl || '/assets/sunstar-logo.jpg'}
+                          alt={`${article.title} - Slide ${idx + 1}`}
+                          style={{
+                            width: '100%',
+                            maxHeight: '520px',
+                            objectFit: 'cover',
+                            display: 'block',
+                          }}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/assets/sunstar-logo.jpg';
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {displayImages.length > 1 && (
+                    <>
+                      {/* Left Navigation Arrow */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : displayImages.length - 1))}
+                        style={{
+                          position: 'absolute',
+                          left: '14px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '44px',
+                          height: '44px',
+                          fontSize: '1.4rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backdropFilter: 'blur(6px)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                          zIndex: 3,
+                          transition: 'all 0.2s ease',
+                        }}
+                        title="अघिल्लो तस्बिर"
+                      >
+                        ❮
+                      </button>
+
+                      {/* Right Navigation Arrow */}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedImageIndex((prev) => (prev < displayImages.length - 1 ? prev + 1 : 0))}
+                        style={{
+                          position: 'absolute',
+                          right: '14px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '44px',
+                          height: '44px',
+                          fontSize: '1.4rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backdropFilter: 'blur(6px)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                          zIndex: 3,
+                          transition: 'all 0.2s ease',
+                        }}
+                        title="पछिल्लो तस्बिर"
+                      >
+                        ❯
+                      </button>
+
+                      {/* Slide Counter Badge */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: '14px',
+                          right: '14px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                          color: '#fff',
+                          padding: '4px 14px',
+                          borderRadius: '20px',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          backdropFilter: 'blur(6px)',
+                          zIndex: 3,
+                        }}
+                      >
+                        📷 {selectedImageIndex + 1} / {displayImages.length}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Dot Pagination Indicators */}
+                {displayImages.length > 1 && (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '14px' }}>
+                    {displayImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedImageIndex(idx)}
+                        style={{
+                          width: selectedImageIndex === idx ? '28px' : '10px',
+                          height: '10px',
+                          borderRadius: '5px',
+                          backgroundColor: selectedImageIndex === idx ? 'var(--brand-orange)' : 'var(--border-color)',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
+                        }}
+                        title={`तस्बिर ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+
                 {article.caption && (
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '8px' }}>
                     📷 {article.caption}
@@ -254,39 +400,6 @@ export default function SingleArticleClient({ article, relatedArticles, trending
                 )}
               </div>
             )}
-
-            {/* Summary Box */}
-            {article.summary && (
-              <div
-                style={{
-                  backgroundColor: 'rgba(249, 115, 22, 0.08)',
-                  borderLeft: '4px solid var(--brand-orange)',
-                  padding: '16px 20px',
-                  borderRadius: '0 8px 8px 0',
-                  marginBottom: '28px',
-                  fontSize: '1.05rem',
-                  fontWeight: 700,
-                  lineHeight: 1.6,
-                  color: 'var(--text-primary)',
-                }}
-              >
-                {article.summary}
-              </div>
-            )}
-
-            {/* Full Body Article Text */}
-            <div
-              className="single-article-content single-article-content-body"
-              style={{
-                fontSize: '1.1rem',
-                lineHeight: 1.8,
-                color: 'var(--text-secondary)',
-                marginBottom: '36px',
-              }}
-              dangerouslySetInnerHTML={{
-                __html: article.content || `<p>${article.summary || article.title}</p>`,
-              }}
-            />
 
             {/* Like & Reaction Bar */}
             <div

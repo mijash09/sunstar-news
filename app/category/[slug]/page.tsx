@@ -1,10 +1,12 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
 import CategoryPageLayout from '@/components/templates/CategoryPageLayout';
 import NewsSectionEkantipur from '@/components/organisms/NewsSectionEkantipur';
 import CategoryLoadMore from '@/components/molecules/CategoryLoadMore';
 import AdBanner from '@/components/molecules/AdBanner';
-import SUNSTAR_DATA, { Article, getAllArticles } from '@/lib/data';
+import { getAllArticles } from '@/lib/data';
+import { getCategoryArticlesAsync } from '@/lib/article-data';
+
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: { slug: string };
@@ -99,54 +101,11 @@ export function generateStaticParams() {
   ];
 }
 
-export default function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params }: Props) {
   const categoryTitle = categoryTitles[params.slug] || 'समाचार वर्ग';
   const cleanTitle = categoryTitle.replace(/^[^\w\s\u0900-\u097F]+/, '').trim();
 
-  let articles: Article[] = [];
-  if (params.slug === 'politics') articles = SUNSTAR_DATA.politicsNews;
-  else if (params.slug === 'business') articles = SUNSTAR_DATA.businessNews;
-  else if (params.slug === 'sports') articles = SUNSTAR_DATA.sportsNews;
-  else if (params.slug === 'entertainment') articles = SUNSTAR_DATA.entertainmentNews;
-  else if (params.slug === 'world') articles = SUNSTAR_DATA.worldNews;
-  else if (params.slug === 'exclusive') articles = SUNSTAR_DATA.exclusiveNews;
-  else if (params.slug === 'interview') articles = SUNSTAR_DATA.interviewNews;
-  else if (params.slug === 'feature') articles = SUNSTAR_DATA.featureNews;
-  else if (params.slug === 'technology') articles = SUNSTAR_DATA.technologyNews;
-  else if (params.slug === 'opinion') {
-    articles = SUNSTAR_DATA.opinions.map((op) => ({
-      id: op.id,
-      title: op.title,
-      category: 'विचार / विश्लेषण',
-      author: op.author,
-      time: op.time,
-      summary: op.summary,
-      image: op.avatar,
-    }));
-  } else if (SUNSTAR_DATA.pradeshNews[params.slug]) {
-    articles = (SUNSTAR_DATA.pradeshNews[params.slug] || []).map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      category: `प्रदेश (${item.location || 'नेपाल'})`,
-      time: item.time,
-      source: item.source || 'सनस्टार न्युज',
-      image: item.image || 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&auto=format&fit=crop&q=80',
-      summary: item.summary || item.title,
-    }));
-  } else {
-    const all = getAllArticles();
-    articles = all.filter((a) =>
-      a.category.toLowerCase().includes(params.slug.toLowerCase()) ||
-      (a.categorySlug && a.categorySlug === params.slug)
-    );
-    if (articles.length === 0) {
-      articles = all.slice(0, 6);
-    }
-  }
-
-  const allCategoryArticles = [...articles, ...getAllArticles().filter(a => a.categorySlug !== params.slug)];
-  const lead = articles[0];
-  const rest = articles.slice(1);
+  const { articles, lead, rest, allCategoryArticles } = await getCategoryArticlesAsync(params.slug);
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',

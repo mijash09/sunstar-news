@@ -1,0 +1,525 @@
+/* =============================================
+   SUNSTAR DASHBOARD — Clean Light Mode UI
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Layout Root ─────────────────────────── */
+.dashRoot {
+  height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  background: #f5f6fa !important;
+}
+
+/* ── Sidebar ─────────────────────────────── */
+.sidebar {
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: #fff !important;
+  border-right: 1px solid #e8eaed !important;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.06) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebarLogo {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid #f0f1f3;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: #fa8c16 !important;
+  display: block !important;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logoSubtext {
+  color: #9ca3af !important;
+  font-size: 0.68rem !important;
+  margin-top: 2px !important;
+  display: block;
+}
+
+/* Menu scrollable area */
+.sideMenuWrap {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+}
+
+.sideMenuWrap::-webkit-scrollbar { width: 4px; }
+.sideMenuWrap::-webkit-scrollbar-track { background: transparent; }
+.sideMenuWrap::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+
+.logoutWrap {
+  flex-shrink: 0;
+  padding: 12px 16px 16px;
+  border-top: 1px solid #f0f1f3;
+  background: #fff;
+}
+
+.logoutBtn {
+  background: #fff2f0 !important;
+  border: 1px solid #ffa39e !important;
+  color: #cf1322 !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  width: 100% !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  font-size: 0.85rem !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.logoutBtn:hover {
+  background: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3) !important;
+}
+
+/* ── Sidebar Menu ───────────────────────── */
+.sideMenu :global(.ant-menu-item) {
+  margin: 2px 8px !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  transition: all 0.15s ease !important;
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+.sideMenu :global(.ant-menu-item-selected) {
+  background: #fff7e6 !important;
+  color: #fa8c16 !important;
+  font-weight: 600 !important;
+}
+
+.sideMenu :global(.ant-menu-item-selected .ant-menu-item-icon),
+.sideMenu :global(.ant-menu-item-selected svg) {
+  color: #fa8c16 !important;
+}
+
+.sideMenu :global(.ant-menu-item:not(.ant-menu-item-selected):hover) {
+  background: #f9fafb !important;
+  color: #111827 !important;
+}
+
+/* ── Main Layout (right of sidebar) ────── */
+.mainArea {
+  flex: 1 1 0%;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  min-width: 0;
+}
+
+/* ── Header ──────────────────────────────── */
+.header {
+  background: #fff !important;
+  border-bottom: 1px solid #e8eaed !important;
+  padding: 0 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 60px !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  z-index: 10 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+}
+
+.collapseToggle {
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  color: #6b7280 !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all 0.18s;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.collapseToggle:hover {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
+
+.menuToggle {
+  display: none;
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  color: #6b7280 !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all 0.18s;
+}
+
+.menuToggle:hover {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+.headerTitle {
+  color: #111827 !important;
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* ── Content Scroll Area ────────────────── */
+.contentScroll {
+  flex: 1 1 0%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f5f6fa !important;
+}
+
+.contentScroll::-webkit-scrollbar { width: 6px; }
+.contentScroll::-webkit-scrollbar-track { background: #f5f6fa; }
+.contentScroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
+.contentScroll::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.contentInner {
+  padding: 24px;
+  max-width: 1600px;
+}
+
+/* ── Stat Cards ──────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 14px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle at top right, var(--card-color, rgba(250,140,22,0.08)) 0%, transparent 70%);
+  border-radius: inherit;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.statIcon {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.statValue {
+  font-size: 1.8rem !important;
+  font-weight: 800 !important;
+  color: #111827 !important;
+  line-height: 1 !important;
+  margin: 0 0 4px !important;
+}
+
+.statLabel {
+  font-size: 0.73rem !important;
+  color: #9ca3af !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600 !important;
+}
+
+.statTrend {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.trendUp {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+/* ── Panel / Card ────────────────────────── */
+.panel {
+  background: #fff !important;
+  border: 1px solid #e8eaed !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.panelHeader {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panelTitle {
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+}
+
+.panelBody {
+  padding: 18px;
+}
+
+/* ── Table ───────────────────────────────── */
+.lightTable :global(.ant-table) {
+  background: #fff !important;
+}
+
+.lightTable :global(.ant-table-thead > tr > th) {
+  background: #f9fafb !important;
+  color: #6b7280 !important;
+  border-bottom: 1px solid #e8eaed !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700 !important;
+}
+
+.lightTable :global(.ant-table-tbody > tr > td) {
+  background: #fff !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+.lightTable :global(.ant-table-tbody > tr:hover > td) {
+  background: #fafafa !important;
+}
+
+/* ── Filter Bar ──────────────────────────── */
+.filterBar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+}
+
+/* ── Buttons ─────────────────────────────── */
+.btnPrimary {
+  background: linear-gradient(135deg, #fa8c16, #e8680a) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(250,140,22,0.3) !important;
+  color: #fff !important;
+  transition: all 0.18s ease !important;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(250,140,22,0.4) !important;
+}
+
+.btnGhost {
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.18s ease !important;
+}
+
+.btnGhost:hover {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+/* ── Tags ────────────────────────────────── */
+.tagCategory {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 6px !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+}
+
+/* ── Article row items ───────────────────── */
+.articleThumb {
+  width: 64px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e8eaed;
+}
+
+.articleTitle {
+  font-weight: 600 !important;
+  color: #111827 !important;
+  line-height: 1.35 !important;
+  font-size: 0.88rem !important;
+}
+
+.articleMeta {
+  font-size: 0.73rem !important;
+  color: #9ca3af !important;
+  margin-top: 2px;
+}
+
+/* ── Breaking news box ───────────────────── */
+.breakingBox {
+  background: #fff5f5 !important;
+  border: 1px solid #fecaca !important;
+  border-radius: 12px !important;
+  padding: 18px !important;
+  margin-bottom: 18px !important;
+}
+
+/* ── Modals ──────────────────────────────── */
+.lightModal :global(.ant-modal-content) {
+  background: #fff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+}
+
+.lightModal :global(.ant-modal-header) {
+  background: #fff !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  border-radius: 14px 14px 0 0 !important;
+}
+
+.lightModal :global(.ant-modal-title) {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+/* ── Mobile Drawer Overlay ───────────────── */
+.mobileDrawerOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  backdrop-filter: blur(3px);
+}
+
+.mobileDrawer {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100vh;
+  background: #fff;
+  border-right: 1px solid #e8eaed;
+  box-shadow: 4px 0 20px rgba(0,0,0,0.12);
+  z-index: 210;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileDrawerOpen {
+  left: 0 !important;
+}
+
+.mobileDrawerOverlayVisible {
+  display: block !important;
+}
+
+/* ── Fade-in animation ───────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fadeUp { animation: fadeUp 0.3s ease both; }
+.fadeUp:nth-child(1) { animation-delay: 0.04s; }
+.fadeUp:nth-child(2) { animation-delay: 0.08s; }
+.fadeUp:nth-child(3) { animation-delay: 0.12s; }
+.fadeUp:nth-child(4) { animation-delay: 0.16s; }
+.fadeUp:nth-child(5) { animation-delay: 0.20s; }
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 768px) {
+  .menuToggle {
+    display: flex !important;
+    align-items: center;
+  }
+
+  .collapseToggle {
+    display: none !important;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+
+  .filterBar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .contentInner {
+    padding: 14px !important;
+  }
+
+  .header {
+    padding: 0 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .statValue {
+    font-size: 1.35rem !important;
+  }
+}

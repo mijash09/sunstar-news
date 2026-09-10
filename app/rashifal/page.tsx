@@ -20,6 +20,7 @@ export default function RashifalPage() {
   const [activePeriod, setActivePeriod] = useState('daily');
   const [selectedSign, setSelectedSign] = useState<any>(null);
   const [rashifalList, setRashifalList] = useState<any[]>(SUNSTAR_DATA.rashifal || []);
+  const [currentDateStr, setCurrentDateStr] = useState<string>(SUNSTAR_DATA.rashifalDate);
   const [loading, setLoading] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -33,6 +34,9 @@ export default function RashifalPage() {
       .then((data) => {
         if (active && data && Array.isArray(data.predictions) && data.predictions.length > 0) {
           setRashifalList(data.predictions);
+          if (data.date) {
+            setCurrentDateStr(data.date);
+          }
         }
       })
       .catch((err) => {
@@ -123,11 +127,29 @@ export default function RashifalPage() {
               fontSize: '2rem',
               fontWeight: 900,
               color: 'var(--text-primary)',
-              marginBottom: '8px',
+              marginBottom: '4px',
             }}
           >
             {titleText}
           </h1>
+          <div style={{ margin: '6px 0 12px 0' }}>
+            <span
+              style={{
+                fontSize: '0.88rem',
+                fontWeight: 800,
+                color: 'var(--brand-orange)',
+                backgroundColor: 'rgba(255, 85, 0, 0.08)',
+                padding: '4px 12px',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 85, 0, 0.2)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              📅 {currentDateStr}
+            </span>
+          </div>
           <p style={{ fontSize: '1rem', color: 'var(--text-muted)', maxWidth: '680px', margin: '0 auto' }}>
             {subtitleText}
           </p>
@@ -223,21 +245,27 @@ export default function RashifalPage() {
                       />
                       <span
                         style={{
-                          fontSize: '0.75rem',
+                          fontSize: '0.72rem',
                           fontWeight: 700,
-                          color: 'var(--text-muted)',
-                          backgroundColor: 'var(--bg-alt)',
+                          color: 'var(--brand-orange)',
+                          backgroundColor: 'rgba(255, 85, 0, 0.08)',
                           padding: '3px 8px',
                           borderRadius: '12px',
+                          border: '1px solid rgba(255, 85, 0, 0.15)',
                         }}
                       >
-                        {item.dateRange || 'राशि फल'}
+                        🔤 नामका अक्षरहरू
                       </span>
                     </div>
 
                     <h3 style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--text-primary)', marginBottom: '2px' }}>
                       {signName} {latinStr}
                     </h3>
+                    {item.letters && (
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 8px 0', fontWeight: 700 }}>
+                        👉 {item.letters}
+                      </p>
+                    )}
 
                     <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', marginTop: '6px' }}>
                       {item.luckyColor && (
@@ -360,7 +388,7 @@ export default function RashifalPage() {
                       {selectedSign.sign} {selectedSign.latinName || ''}
                     </h2>
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      {selectedSign.dateRange}
+                      🔤 नामको सुरुको अक्षर: <strong>{selectedSign.letters || 'अक्षरहरू'}</strong>
                     </span>
                   </div>
                 </div>

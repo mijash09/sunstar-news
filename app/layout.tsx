@@ -127,6 +127,10 @@ const jsonLdWebsite = {
   },
 };
 
+import ReactQueryProvider from '@/components/providers/ReactQueryProvider';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
+import { Toaster } from 'react-hot-toast';
+
 export default function RootLayout({
   children,
 }: {
@@ -145,7 +149,14 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AntdRegistry>
+          <ReactQueryProvider>
+            <Toaster position="top-right" reverseOrder={false} />
+            {children}
+          </ReactQueryProvider>
+        </AntdRegistry>
+      </body>
     </html>
   );
 }

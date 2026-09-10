@@ -1,26 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 import SUNSTAR_DATA, { RashifalItem } from '@/lib/data';
+import { getTodayNepaliDate } from '@/lib/nepaliDate';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Cache response for 1 hour
+export const revalidate = 900; // Cache response for 15 minutes to stay fresh daily
 
 interface HamroPrediction {
   sunsign: string;
   prediction: string;
 }
 
-const PERIOD_PREFIXES: Record<string, string> = {
-  daily: 'आजको ग्रहगोचर र नक्षत्र प्रभाव:',
-  weekly: 'यो साताको ग्रहगोचर र साप्ताहिक विश्लेषण:',
-  monthly: 'यो महिनाको ग्रहगोचर र व्यापार/स्वास्थ्य विश्लेषण:',
-  yearly: 'वर्ष २०८३ सालभरिको वृहत ग्रहगोचर र वार्षिक भविष्यफल:',
-};
+const TARGET_SIGNS = [
+  'मेष',
+  'वृष',
+  'मिथुन',
+  'कर्कट',
+  'सिंह',
+  'कन्या',
+  'तुला',
+  'वृश्चिक',
+  'धनु',
+  'मकर',
+  'कुम्भ',
+  'मीन',
+];
 
-// Rich fallback dataset generator for periods
+function isSyllableList(text: string): boolean {
+  if (!text) return true;
+  const commaCount = (text.match(/,/g) || []).length;
+  if (commaCount >= 3 && text.length < 90) return true;
+  if (
+    text.includes('चु, चे, चो') ||
+    text.includes('का, कि, कु') ||
+    text.includes('हि, हु, हे') ||
+    text.includes('मा, मि, मु') ||
+    text.includes('तो, ना, नि')
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function getPeriodFallbackPredictions(type: string): RashifalItem[] {
   const baseList = SUNSTAR_DATA.rashifal || [];
-  const prefix = PERIOD_PREFIXES[type] || PERIOD_PREFIXES.daily;
 
   return baseList.map((item) => {
     let customPrediction = item.prediction;
@@ -43,6 +66,7 @@ function getPeriodFallbackPredictions(type: string): RashifalItem[] {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = (searchParams.get('type') || 'daily').toLowerCase();
+  const todayInfo = getTodayNepaliDate();
 
   try {
     let targetUrl = 'https://www.hamropatro.com/rashifal';
@@ -61,7 +85,7 @@ export async function GET(request: NextRequest) {
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'ne-NP,ne;q=0.9,en-US;q=0.8,en;q=0.7',
       },
-      next: { revalidate: 3600 },
+      next: { revalidate: 900 },
     });
 
     if (!res.ok) {
@@ -71,95 +95,104 @@ export async function GET(request: NextRequest) {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    const scrapedList: HamroPrediction[] = [];
-    const targetSigns = [
-      'मेष',
-      'वृष',
-      'मिथुन',
-      'कर्कट',
-      'सिंह',
-      'कन्या',
-      'तुला',
-      'वृश्चिक',
-      'धनु',
-      'मकर',
-      'कुम्भ',
-      'मीन',
-    ];
+    // Extract Live Date from Page Title or Header
+    const pageTitle = $('title').text().trim();
+    let liveDateString = todayInfo.rashifalTitleDate;
 
-    // Helper: Verify if text is a genuine prediction paragraph (not a syllable list)
-    const isRealPrediction = (txt: string): boolean => {
-      if (!txt || txt.length < 45) return false;
-      // Syllables usually contain 4+ commas separating 1-2 character letters
-      const commaCount = (txt.match(/,/g) || []).length;
-      if (commaCount >= 4 && txt.length < 70) return false;
-      return true;
-    };
-
-    // 1. DOM Traversal matching exact target signs
-    targetSigns.forEach((sign) => {
-      let signNode: any = null;
-      $('*').each((_: any, el: any) => {
-        if ($(el).children().length === 0 && $(el).text().trim() === sign) {
-          signNode = $(el);
-        }
-      });
-
-      if (signNode) {
-        let parentBox = signNode.parent();
-        for (let i = 0; i < 5; i++) {
-          if (
-            parentBox.find('p, span, div').filter((_: any, p: any) => {
-              const txt = $(p).text().trim();
-              return isRealPrediction(txt);
-            }).length > 0
-          ) {
-            break;
-          }
-          parentBox = parentBox.parent();
-        }
-
-        const predictionText = parentBox
-          .find('p, span, div')
-          .filter((_: any, el: any) => {
-            const txt = $(el).text().trim();
-            return isRealPrediction(txt) && !txt.startsWith(sign);
-          })
-          .first()
-          .text()
-          .trim();
-
-        if (predictionText && isRealPrediction(predictionText)) {
-          scrapedList.push({
-            sunsign: sign,
-            prediction: predictionText,
-          });
-        }
+    if (pageTitle.includes('—')) {
+      const parsedPart = pageTitle.split('—')[0].trim();
+      if (parsedPart.length > 5) {
+        liveDateString = parsedPart;
       }
-    });
-
-    // 2. Legacy fallback selectors (h3 & .desc) if scrape array incomplete
-    if (scrapedList.length < 12) {
-      for (let i = 0; i < 12; i++) {
-        const sign = $('h3').eq(i).text().trim();
-        const rawDesc = $('.desc').find('p').eq(i).text().trim();
-        const cleanDesc = rawDesc.includes(')') ? rawDesc.split(')')[1].trim() : rawDesc;
-
-        if (
-          sign &&
-          cleanDesc &&
-          isRealPrediction(cleanDesc) &&
-          !scrapedList.some((item) => item.sunsign === sign)
-        ) {
-          scrapedList.push({
-            sunsign: sign,
-            prediction: cleanDesc,
-          });
-        }
+    } else if (pageTitle.includes('Rashifal')) {
+      const parsedPart = pageTitle.split('Rashifal')[0].trim();
+      if (parsedPart.length > 5) {
+        liveDateString = parsedPart;
       }
     }
 
-    // 3. Map predictions into full RashifalItem list with robust fallback
+    const scrapedList: HamroPrediction[] = [];
+
+    // 1. Scrape Modern Tailwind Cards (.hp-card-surface, article, .rashifal-card, div[class*="card"])
+    $('.hp-card-surface, article, .rashifal-card, div[class*="card"]').each((_, el) => {
+      const cardObj = $(el);
+      const cardText = cardObj.text().trim();
+
+      TARGET_SIGNS.forEach((sign) => {
+        const hasSignHeading =
+          cardObj.find('h1, h2, h3, h4, span, div, strong').filter((_, child) => $(child).text().trim() === sign).length > 0;
+
+        if (hasSignHeading || cardText.startsWith(sign)) {
+          const candidates = cardObj
+            .find('p, span, div')
+            .map((_, child) => $(child).text().trim())
+            .get();
+
+          let bestPrediction = '';
+          candidates.forEach((t) => {
+            if (
+              t.length > 30 &&
+              !isSyllableList(t) &&
+              !t.startsWith(sign) &&
+              !t.includes('शुभ अंक') &&
+              !t.includes('शुभ रंग') &&
+              t.length > bestPrediction.length
+            ) {
+              bestPrediction = t;
+            }
+          });
+
+          if (!bestPrediction) {
+            const raw = cardText.replace(sign, '').trim();
+            if (raw.length > 30 && !isSyllableList(raw)) {
+              bestPrediction = raw;
+            }
+          }
+
+          if (bestPrediction && !scrapedList.some((s) => s.sunsign === sign)) {
+            scrapedList.push({ sunsign: sign, prediction: bestPrediction });
+          }
+        }
+      });
+    });
+
+    // 2. Fallback Selector Matching if any signs missed
+    if (scrapedList.length < 12) {
+      TARGET_SIGNS.forEach((sign) => {
+        if (!scrapedList.some((s) => s.sunsign === sign)) {
+          let signNode: any = null;
+          $('*').each((_: any, el: any) => {
+            if ($(el).children().length === 0 && $(el).text().trim() === sign) {
+              signNode = $(el);
+            }
+          });
+
+          if (signNode) {
+            let parentBox = signNode.parent();
+            for (let i = 0; i < 5; i++) {
+              if (parentBox.find('p').length > 0) break;
+              parentBox = parentBox.parent();
+            }
+
+            const pText = parentBox
+              .find('p')
+              .filter((_: any, p: any) => {
+                const txt = $(p).text().trim();
+                return txt.length > 30 && !isSyllableList(txt);
+              })
+              .first()
+              .text()
+              .trim();
+
+            if (pText) {
+              scrapedList.push({ sunsign: sign, prediction: pText });
+            }
+          }
+        }
+      });
+    }
+
+    // 3. Map predictions into full RashifalItem list
     const fallbackList = getPeriodFallbackPredictions(type);
     const mergedRashifal: RashifalItem[] = fallbackList.map((item) => {
       const match = scrapedList.find(
@@ -168,14 +201,17 @@ export async function GET(request: NextRequest) {
 
       return {
         ...item,
-        prediction: match && isRealPrediction(match.prediction) ? match.prediction : item.prediction,
+        prediction: match && match.prediction.length > 25 ? match.prediction : item.prediction,
       };
     });
 
     return NextResponse.json({
       success: true,
       type,
-      source: 'Hamro Patro Live',
+      source: 'Hamro Patro Live API',
+      date: liveDateString,
+      formattedBsDate: todayInfo.formattedBsDate,
+      fullDate: todayInfo.formattedFullDate,
       timestamp: new Date().toISOString(),
       predictions: mergedRashifal,
     });
@@ -186,9 +222,11 @@ export async function GET(request: NextRequest) {
       success: true,
       type,
       source: 'Sunstar Astrology Engine',
+      date: todayInfo.rashifalTitleDate,
+      formattedBsDate: todayInfo.formattedBsDate,
+      fullDate: todayInfo.formattedFullDate,
       predictions: getPeriodFallbackPredictions(type),
       error: err.message,
     });
   }
 }
-

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Badge from '@/components/atoms/Badge';
 import ArticleMeta from '@/components/molecules/ArticleMeta';
 import SourcePill from '@/components/atoms/SourcePill';
+import SocialShareBar from '@/components/molecules/SocialShareBar';
 import { Article } from '@/lib/data';
 
 export default function ArticleModal({
@@ -64,6 +65,14 @@ export default function ArticleModal({
             >
               पूर्ण पृष्ठमा हेर्नुहोस् 🔗
             </Link>
+          </div>
+
+          <div style={{ padding: '0 30px', marginTop: '16px' }}>
+            <SocialShareBar
+              title={article.title}
+              url={`https://sunstarnews.com/news/${article.id}`}
+              compact
+            />
           </div>
 
           {article.image && (

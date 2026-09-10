@@ -8,6 +8,7 @@ import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
 import { useRouter } from 'next/navigation';
 import { RashifalItem, getArticleById } from '@/lib/data';
+import SUNSTAR_DATA from '@/lib/data';
 
 interface Comment {
   id: string;
@@ -62,6 +63,7 @@ const INITIAL_COMMENTS: Record<string, Comment[]> = {
 export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
   const [activePeriod, setActivePeriod] = useState('daily');
   const [predictionText, setPredictionText] = useState(initialItem.prediction);
+  const [liveDateStr, setLiveDateStr] = useState<string>(SUNSTAR_DATA.rashifalDate);
   const [loading, setLoading] = useState(false);
 
   // Comments state
@@ -82,13 +84,18 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
     fetch('/api/rashifal?type=' + activePeriod)
       .then((res) => res.json())
       .then((data) => {
-        if (active && data && Array.isArray(data.predictions)) {
-          const found = data.predictions.find(
-            (p: RashifalItem) =>
-              p.id === initialItem.id || p.sign === initialItem.sign
-          );
-          if (found && found.prediction) {
-            setPredictionText(found.prediction);
+        if (active && data) {
+          if (data.date) {
+            setLiveDateStr(data.date);
+          }
+          if (Array.isArray(data.predictions)) {
+            const found = data.predictions.find(
+              (p: RashifalItem) =>
+                p.id === initialItem.id || p.sign === initialItem.sign
+            );
+            if (found && found.prediction) {
+              setPredictionText(found.prediction);
+            }
           }
         }
       })
@@ -180,14 +187,19 @@ export default function SingleRashifalClient({ initialItem, allSigns }: Props) {
               </div>
 
               <div>
-                <span className="shadcn-badge shadcn-badge-orange" style={{ marginBottom: '6px', fontSize: '0.78rem' }}>
-                  🔮 सनस्टार ज्योतिष भविष्यफल
-                </span>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '6px' }}>
+                  <span className="shadcn-badge shadcn-badge-orange" style={{ fontSize: '0.78rem' }}>
+                    🔮 सनस्टार ज्योतिष भविष्यफल
+                  </span>
+                  <span className="shadcn-badge shadcn-badge-success" style={{ fontSize: '0.78rem' }}>
+                    📅 {liveDateStr}
+                  </span>
+                </div>
                 <h1 style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0, lineHeight: 1.15 }}>
                   {initialItem.sign} राशि ({initialItem.latinName})
                 </h1>
                 <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0 }}>
-                  🗓️ जन्म समयावधि: <strong>{initialItem.dateRange || 'राशि नक्षत्र'}</strong>
+                  🔤 नामको पहिलो अक्षर: <strong>{initialItem.letters || 'अक्षरहरू'}</strong>
                 </p>
               </div>
             </div>

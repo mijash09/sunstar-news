@@ -7,6 +7,7 @@ import SectionHeader from '@/components/molecules/SectionHeader';
 export default function RashifalSection() {
   const [selectedSign, setSelectedSign] = useState(null);
   const [rashifalList, setRashifalList] = useState(SUNSTAR_DATA.rashifal || []);
+  const [liveDate, setLiveDate] = useState(SUNSTAR_DATA.rashifalDate);
   const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
@@ -15,6 +16,9 @@ export default function RashifalSection() {
       .then((data) => {
         if (data && data.success && Array.isArray(data.predictions) && data.predictions.length > 0) {
           setRashifalList(data.predictions);
+          if (data.date) {
+            setLiveDate(data.date);
+          }
           setIsLive(true);
         }
       })
@@ -23,8 +27,27 @@ export default function RashifalSection() {
 
   return (
     <div id="rashifal" className="rashifal-section-block" style={{ marginBottom: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
         <SectionHeader title="🔮 दैनिक राशिफल (Daily Horoscope)" viewAllHref="/rashifal" viewAllText="सबै राशिफल (दैनिक, साप्ताहिक, मासिक, वार्षिक) ➔" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            style={{
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              backgroundColor: 'rgba(255, 85, 0, 0.08)',
+              color: 'var(--brand-orange)',
+              padding: '4px 10px',
+              borderRadius: '20px',
+              border: '1px solid rgba(255, 85, 0, 0.2)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block' }}></span>
+            📅 {liveDate}
+          </span>
+        </div>
       </div>
 
       <div
@@ -74,11 +97,28 @@ export default function RashifalSection() {
                 fontWeight: 600,
                 color: 'var(--text-muted)',
                 display: 'block',
-                marginBottom: '10px',
+                marginBottom: '4px',
               }}
             >
               {item.latinName}
             </span>
+            {item.letters && (
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  color: 'var(--brand-orange)',
+                  display: 'block',
+                  marginBottom: '10px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                title={`नामक अक्षर: ${item.letters}`}
+              >
+                🔤 {item.letters}
+              </span>
+            )}
 
             <div
               style={{
@@ -188,7 +228,7 @@ export default function RashifalSection() {
                     {(selectedSign as any).sign} ({(selectedSign as any).latinName})
                   </h2>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    {(selectedSign as any).dateRange}
+                    🔤 नामको सुरुको अक्षर: <strong>{(selectedSign as any).letters || 'अक्षरहरू'}</strong>
                   </span>
                 </div>
               </div>
