@@ -1,0 +1,71 @@
+name: Deploy Next.js App to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy-ftp:
+    name: 🚀 Build & Deploy to cPanel (FTP/SFTP)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏗️ Build Next.js Application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: 📂 Create cPanel Restart Trigger File
+        run: |
+          mkdir -p tmp
+          touch tmp/restart.txt
+
+      - name: 🚀 Sync Files to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.CPANEL_FTP_SERVER }}
+          username: ${{ secrets.CPANEL_FTP_USERNAME }}
+          password: ${{ secrets.CPANEL_FTP_PASSWORD }}
+          port: ${{ secrets.CPANEL_FTP_PORT || 21 }}
+          server-dir: ${{ secrets.CPANEL_TARGET_DIR || '/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env.local
+            README.md
+            DATABASE_SCHEMA_PLAN.md
+            CPANEL_DEPLOYMENT_GUIDE.md
+
+# Optional SSH Automated Deployment (Uncomment if you have SSH access enabled in cPanel)
+#  deploy-ssh:
+#    name: 🚀 Deploy via SSH on cPanel
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Execute Remote SSH Commands
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.CPANEL_SSH_HOST }}
+#          username: ${{ secrets.CPANEL_SSH_USER }}
+#          key: ${{ secrets.CPANEL_SSH_KEY }}
+#          port: ${{ secrets.CPANEL_SSH_PORT || 22 }}
+#          script: |
+#            cd ${{ secrets.CPANEL_APP_DIR || '~/sunstar-news' }}
+#            git pull origin main
+#            npm install
+#            npm run build
+#            mkdir -p tmp
+#            touch tmp/restart.txt

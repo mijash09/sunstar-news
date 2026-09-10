@@ -1,13 +1,30 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import bcrypt from 'bcryptjs';
 import { sql } from '@/lib/db';
 import { signToken, AUTH_COOKIE, UserRole } from '@/lib/auth';
 import { initDatabase } from '@/lib/init-db';
+import { loginLimiter } from '@/lib/rate-limit';
 
 export async function loginAction(prevState: any, formData: FormData) {
+  // ── Rate limiting ──────────────────────────────────────────────────────────
+  const headersList = headers();
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    'unknown';
+
+  const rl = loginLimiter.check(ip);
+  if (!rl.success) {
+    const secs = Math.ceil(rl.retryAfterMs / 1000);
+    return {
+      error: `धेरै लगइन प्रयासहरू भए। ${secs} सेकेन्ड पछि पुनः प्रयास गर्नुहोस् (Too many attempts — retry in ${secs}s)`,
+    };
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
   try {
     await initDatabase();
 
@@ -68,6 +85,9 @@ export async function loginAction(prevState: any, formData: FormData) {
       return { error: 'प्रयोगकर्ता नाम वा पासवर्ड गलत छ (Invalid username or password)' };
     }
 
+    // Successful login → reset rate limiter for this IP
+    loginLimiter.reset(ip);
+
     const token = await signToken({
       id: user.id as number,
       email: user.email as string,
@@ -95,3 +115,5 @@ export async function logoutAction() {
   cookieStore.delete(AUTH_COOKIE);
   redirect('/login');
 }
+
+

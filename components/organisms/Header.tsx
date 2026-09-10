@@ -47,7 +47,7 @@ export default function Header({
       <header className="top-utility-bar">
         <div className="container">
           <div className="utility-left">
-            <LiveDateBadge text="१५ भाद्र २०८३, सोमबार" />
+            <LiveDateBadge />
             <WeatherWidget
               city={SUNSTAR_DATA.weather.city}
               temp={SUNSTAR_DATA.weather.temp}

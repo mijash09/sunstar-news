@@ -1,28 +1,84 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SUNSTAR_DATA from '@/lib/data';
 import PulseDot from '@/components/atoms/PulseDot';
 import Link from 'next/link';
 
-export default function Tickers() {
-  const nepseData = SUNSTAR_DATA.nepseTicker;
-  const stocks = SUNSTAR_DATA.trendingStocks;
+export default function Tickers({ initialBreakingNews }: { initialBreakingNews?: string[] }) {
+  const [stocks, setStocks] = useState<any[]>(SUNSTAR_DATA.trendingStocks || []);
+  const [breakingNews, setBreakingNews] = useState<string[]>(initialBreakingNews || SUNSTAR_DATA.breakingNews || []);
+  const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const tickerRef = useRef<HTMLDivElement>(null);
+  const [animDuration, setAnimDuration] = useState<number>(35);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/landing-data')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data && Array.isArray(data.breakingNews) && data.breakingNews.length > 0) {
+          setBreakingNews(data.breakingNews);
+        }
+      })
+      .catch(() => {});
+
+    fetch('/api/nepse')
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data && Array.isArray(data.stocks) && data.stocks.length > 0) {
+          setStocks(data.stocks);
+          setIsMarketOpen(!!data.isMarketOpen);
+        }
+      })
+      .catch((err) => {
+        console.warn('Live NEPSE Ticker Fetch Error:', err);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Ensure breaking news fills the line and repeats for 100% seamless marquee loop
+  let displayNews = [...breakingNews];
+  if (displayNews.length > 0) {
+    while (displayNews.length < 8) {
+      displayNews = displayNews.concat(breakingNews);
+    }
+  }
+  const seamlessNews = displayNews.concat(displayNews);
+
+  // Measure content width and enforce uniform constant velocity (~60px / sec) for any text length
+  useEffect(() => {
+    if (tickerRef.current) {
+      const totalWidth = tickerRef.current.scrollWidth;
+      const halfWidth = totalWidth / 2; // Width of one set
+      const SPEED_PX_PER_SEC = 60; // Constant pixel speed across all screen sizes
+      const calculatedDuration = Math.max(10, Math.round(halfWidth / SPEED_PX_PER_SEC));
+      setAnimDuration(calculatedDuration);
+    }
+  }, [breakingNews, displayNews.length]);
 
   return (
     <div className="top-tickers-wrapper">
-      {/* 1. Top Trending Live Stock Ticker Bar (Exact match to requested UI) */}
+      {/* 1. Top Trending Live Stock Ticker Bar */}
       <div className="stock-ticker-bar">
         <div className="container">
           {/* Blue Trending Badge */}
           <div className="trending-blue-badge">
-            Trending..
+            NEPSE Live..
           </div>
 
           {/* Stock Ticker Items Row */}
           <div className="stock-ticker-list">
             {stocks.map((stock, idx) => (
-              <div key={idx} className="stock-ticker-item">
+              <div key={stock.symbol || idx} className="stock-ticker-item">
                 <div className="stock-company-name" title={stock.name}>
                   {stock.name}
                 </div>
@@ -45,9 +101,10 @@ export default function Tickers() {
 
           {/* View Stock Live Button Box */}
           <Link href="/category/business" className="view-stock-live-card">
-            <span className="stock-live-title">View Stock Live</span>
+            <span className="stock-live-title">View NEPSE Live</span>
             <span className="stock-market-status">
-              <span style={{ fontSize: '0.65rem' }}>🔴</span> Market Closed
+              <span style={{ fontSize: '0.65rem' }}>{isMarketOpen ? '🟢' : '🔴'}</span>{' '}
+              {isMarketOpen ? 'Market Open' : 'Market Closed'}
             </span>
           </Link>
         </div>
@@ -60,9 +117,15 @@ export default function Tickers() {
             <PulseDot /> भर्खरै
           </div>
           <div className="ticker-content">
-            <div className="ticker-text">
-              {SUNSTAR_DATA.breakingNews.map((item, idx) => (
-                <span key={idx}>
+            <div
+              className="ticker-text"
+              ref={tickerRef}
+              style={{
+                animationDuration: `${animDuration}s`,
+              }}
+            >
+              {seamlessNews.map((item, idx) => (
+                <span key={idx} className="ticker-item">
                   🔥 {item} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
               ))}
@@ -73,4 +136,5 @@ export default function Tickers() {
     </div>
   );
 }
+
 

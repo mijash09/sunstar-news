@@ -6,8 +6,7 @@ import Navigation from '@/components/organisms/Navigation';
 import Tickers from '@/components/organisms/Tickers';
 import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
-import ArticleModal from '@/components/organisms/ArticleModal';
-import { getArticleById, Article } from '@/lib/data';
+import { useRouter } from 'next/navigation';
 
 interface CategoryPageLayoutProps {
   title: string;
@@ -20,20 +19,11 @@ export default function CategoryPageLayout({
   activeHref,
   children,
 }: CategoryPageLayoutProps) {
+  const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
   const handleSelectArticle = (id: string) => {
-    const found = getArticleById(id);
-    if (found) {
-      setSelectedArticle(found);
-      document.body.style.overflow = 'hidden';
-    }
-  };
-
-  const handleCloseModal = () => {
-    setSelectedArticle(null);
-    document.body.style.overflow = '';
+    router.push(`/news/${id}`);
   };
 
   return (
@@ -56,7 +46,6 @@ export default function CategoryPageLayout({
 
       <Footer onOpenSearch={() => setIsSearchOpen(true)} />
 
-      <ArticleModal article={selectedArticle} onClose={handleCloseModal} />
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}

@@ -131,6 +131,34 @@ npm run start
 
 ---
 
+## 🌐 Netlify Hosting & Deployment Guide
+
+This project is configured for **Netlify** using `@netlify/plugin-nextjs`:
+
+1. **Push Code to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Configure Netlify deployment"
+   git push origin sitaram
+   ```
+
+2. **Connect to Netlify**:
+   - Go to [Netlify Dashboard](https://app.netlify.com/) -> **Add new site** -> **Import an existing project**.
+   - Select **GitHub** and pick the repository `sunstar-news`.
+   - Select branch `sitaram` (or `main`).
+
+3. **Build Settings**:
+   - **Build Command**: `npm run build`
+   - **Publish Directory**: `.next`
+
+4. **Environment Variables on Netlify**:
+   Add the following under **Site settings > Environment variables**:
+   - `DATABASE_URL`: `postgresql://neondb_owner:npg_OenEuUSta3M9@ep-fragrant-sunset-a59f6sfk-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+   - `JWT_SECRET`: `sunstar-news-secure-jwt-secret-key-2026-pokhara`
+   - `NODE_VERSION`: `20`
+
+---
+
 ## 🗄️ Database Architecture
 
 The project features a **unified relational PostgreSQL schema** hosted on Neon DB Serverless. All news items live inside a single `articles` table with foreign key relations for `categories`, `provinces` (state), and `districts` (county).

@@ -1,8 +1,21 @@
+import { getTodayNepaliDate } from './nepaliDate';
+
+export interface CommentItem {
+  id: string;
+  name: string;
+  avatar?: string;
+  time: string;
+  text: string;
+  likes?: number;
+  approved?: boolean;
+}
+
 export interface Article {
   id: string;
   title: string;
   slug?: string;
   category: string;
+  categories?: string[];
   categorySlug?: string;
   author?: string;
   authorRole?: string;
@@ -11,11 +24,14 @@ export interface Article {
   date?: string;
   source?: string;
   image?: string;
+  images?: string[];
   caption?: string;
   summary?: string;
   content?: string;
   views?: string;
+  likesCount?: number;
   commentsCount?: number;
+  commentsList?: CommentItem[];
   location?: string;
 }
 
@@ -60,6 +76,19 @@ export interface StoryItem {
   articleId?: string;
 }
 
+export interface RashifalItem {
+  id: string;
+  sign: string;
+  latinName: string;
+  symbol: string;
+  image?: string;
+  letters?: string;
+  dateRange?: string;
+  luckyColor?: string;
+  luckyNumber?: string;
+  prediction: string;
+}
+
 export interface PollOption {
   id: string;
   label: string;
@@ -72,6 +101,24 @@ export interface PollData {
   question: string;
   totalVotes: number;
   options: PollOption[];
+}
+
+export interface BannerAd {
+  id: string;
+  title: string;
+  imageUrl: string;
+  targetUrl: string;
+  position:
+    | 'header-top'
+    | 'hero-side'
+    | 'mid-content-1'
+    | 'mid-content-2'
+    | 'sidebar-widget'
+    | 'single-news-sidebar'
+    | 'rashifal-top'
+    | 'footer-top';
+  isActive: boolean;
+  clicksCount?: number;
 }
 
 export const SUNSTAR_DATA = {
@@ -150,13 +197,72 @@ export const SUNSTAR_DATA = {
     aqi: "५२ (मध्यम)",
   },
 
-  rashifalDate: "१५ भाद्र २०८३ (आजको दैनिक राशिफल)",
+  banners: [
+    {
+      id: 'banner-header-1',
+      title: 'Header Main Leaderboard Ad Banner (728x90)',
+      imageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&auto=format&fit=crop&q=80',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'header-top',
+      isActive: true,
+      clicksCount: 1420,
+    },
+    {
+      id: 'banner-hero-side-1',
+      title: 'Hero Right Sidebar Banner (300x250)',
+      imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop&q=80',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'hero-side',
+      isActive: true,
+      clicksCount: 890,
+    },
+    {
+      id: 'banner-mid-1',
+      title: 'Mid Content Banner 1 (Exclusive/Lead After)',
+      imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&auto=format&fit=crop&q=80',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'mid-content-1',
+      isActive: true,
+      clicksCount: 654,
+    },
+    {
+      id: 'banner-mid-2',
+      title: 'Mid Content Banner 2 (Pradesh After)',
+      imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=1200&auto=format&fit=crop&q=80',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'mid-content-2',
+      isActive: true,
+      clicksCount: 432,
+    },
+    {
+      id: 'banner-sidebar-1',
+      title: 'Right Sidebar Sticky Square Banner (300x250)',
+      imageUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&auto=format&fit=crop&q=80',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'sidebar-widget',
+      isActive: true,
+      clicksCount: 310,
+    },
+    {
+      id: 'banner-footer-1',
+      title: 'Footer Top Leaderboard Banner',
+      imageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&auto=format&fit=crop&q=80',
+      targetUrl: 'https://sunstarnews.com',
+      position: 'footer-top',
+      isActive: true,
+      clicksCount: 205,
+    },
+  ] as BannerAd[],
+
+  rashifalDate: getTodayNepaliDate().rashifalTitleDate,
   rashifal: [
     {
       id: "mesh",
       sign: "मेष",
       latinName: "Aries",
       symbol: "♈",
+      image: "/images/zodiac/mesh.png",
+      letters: "चु, चे, चो, ला, लि, लु, ले, लो, अ",
       dateRange: "चैत १५ - वैशाख १५",
       luckyColor: "रातो",
       luckyNumber: "९",
@@ -167,6 +273,8 @@ export const SUNSTAR_DATA = {
       sign: "वृष",
       latinName: "Taurus",
       symbol: "♉",
+      image: "/images/zodiac/vrish.png",
+      letters: "इ, उ, ए, ओ, वा, वि, वु, वे, वो",
       dateRange: "वैशाख १६ - जेठ १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -177,6 +285,8 @@ export const SUNSTAR_DATA = {
       sign: "मिथुन",
       latinName: "Gemini",
       symbol: "♊",
+      image: "/images/zodiac/mithun.png",
+      letters: "का, कि, कु, घ, ङ, छ, के, को, हा",
       dateRange: "जेठ १६ - असार १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -187,6 +297,8 @@ export const SUNSTAR_DATA = {
       sign: "कर्कट",
       latinName: "Cancer",
       symbol: "♋",
+      image: "/images/zodiac/karkat.png",
+      letters: "ही, हू, हे, हो, डा, डी, डु, डे, डो",
       dateRange: "असार १६ - साउन १५",
       luckyColor: "गुलाबी",
       luckyNumber: "२",
@@ -197,6 +309,8 @@ export const SUNSTAR_DATA = {
       sign: "सिंह",
       latinName: "Leo",
       symbol: "♌",
+      image: "/images/zodiac/simha.png",
+      letters: "मा, मि, मु, मे, मो, टा, टि, टु, टे",
       dateRange: "साउन १६ - भदौ १५",
       luckyColor: "पहेंलो",
       luckyNumber: "१",
@@ -207,6 +321,8 @@ export const SUNSTAR_DATA = {
       sign: "कन्या",
       latinName: "Virgo",
       symbol: "♍",
+      image: "/images/zodiac/kanya.png",
+      letters: "टो, पा, पि, पु, ष, ण, ठ, पे, पो",
       dateRange: "भदौ १६ - असोज १५",
       luckyColor: "हरियो",
       luckyNumber: "५",
@@ -217,6 +333,8 @@ export const SUNSTAR_DATA = {
       sign: "तुला",
       latinName: "Libra",
       symbol: "♎",
+      image: "/images/zodiac/tula.png",
+      letters: "रा, रि, रु, रे, रो, ता, ति, तु, ते",
       dateRange: "असोज १६ - कात्तिक १५",
       luckyColor: "सेतो",
       luckyNumber: "६",
@@ -227,6 +345,8 @@ export const SUNSTAR_DATA = {
       sign: "वृश्चिक",
       latinName: "Scorpio",
       symbol: "♏",
+      image: "/images/zodiac/vrischik.png",
+      letters: "तो, ना, नि, नु, ने, नो, या, यि, यु",
       dateRange: "कात्तिक १६ - मंसीर १५",
       luckyColor: "रातो",
       luckyNumber: "९",
@@ -237,6 +357,8 @@ export const SUNSTAR_DATA = {
       sign: "धनु",
       latinName: "Sagittarius",
       symbol: "♐",
+      image: "/images/zodiac/dhanu.png",
+      letters: "ये, यो, भा, भि, भु, धा, फा, ढा, भे",
       dateRange: "मंसीर १६ - पुस १५",
       luckyColor: "पहेंलो",
       luckyNumber: "३",
@@ -247,6 +369,8 @@ export const SUNSTAR_DATA = {
       sign: "मकर",
       latinName: "Capricorn",
       symbol: "♑",
+      image: "/images/zodiac/makar.png",
+      letters: "भो, जा, जि, जु, जे, जो, ख, खि, खु, खे, खो, गा, गि",
       dateRange: "पुस १६ - माघ १५",
       luckyColor: "नीलो",
       luckyNumber: "८",
@@ -257,6 +381,8 @@ export const SUNSTAR_DATA = {
       sign: "कुम्भ",
       latinName: "Aquarius",
       symbol: "♒",
+      image: "/images/zodiac/kumbha.png",
+      letters: "गु, गे, गो, सा, सि, सु, से, सो, दा",
       dateRange: "माघ १६ - फागुन १५",
       luckyColor: "नीलो",
       luckyNumber: "८",
@@ -267,6 +393,8 @@ export const SUNSTAR_DATA = {
       sign: "मीन",
       latinName: "Pisces",
       symbol: "♓",
+      image: "/images/zodiac/meen.png",
+      letters: "दि, दु, थ, झ, ञ, दे, दो, चा, चि",
       dateRange: "फागुन १६ - चैत १४",
       luckyColor: "पहेंलो",
       luckyNumber: "३",
@@ -321,7 +449,7 @@ export const SUNSTAR_DATA = {
     date: "२० भाद्र २०८३",
     source: "SunstarNews.com",
     image:
-      "https://assets-cdn.ekantipur.com/uploads/source/news/kantipur/2026/miscellaneous/krishna-bhir-0592026123446-1000x0.jpg",
+      "https://radiokathmandu.com/wp-content/uploads/2026/09/krishna-bhir-0592026123446-1000x0-1.jpg",
     caption:
       "कृष्णभीरमा भित्तो काटेर बनाइएको वैकल्पिक डाइभर्सन ट्र्याक। तस्बिर: सनस्टार न्युज",
     summary:
@@ -351,7 +479,7 @@ export const SUNSTAR_DATA = {
       time: "१० मिनेट अघि",
       source: "SunstarNews.com",
       image:
-        "https://assets-cdn.ekantipur.com/uploads/source/news/kantipur/2026/third-party/790317778101646252357973988083052071006119614n-0592026113316-1000x0.jpg",
+        "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1000&auto=format&fit=crop&q=80",
       summary:
         "भोटेकोशी विपत्तिको ११ औँ दिनमा पनि बेत्रावतीबाट एक महिला र त्रिशूली-३ 'ए' को सुरुङभित्र फसेका १ जनाको जीवितै उद्धार। सैनिक अस्पताल छाउनीमा उपचार जारी।",
       content: `<p>भोटेकोशी बाढी र पहिरोको ११ औँ दिनमा बेत्रावती क्षेत्रबाट उद्धार गरिएकी महिलाको नेपाली सेनाको छाउनी अस्पतालमा उपचार भइरहेको छ। उद्धार टोलीले त्रिशूली ३-ए आयोजनाको सुरुङबाट समेत १ जनालाई जीवितै बाहिर निकालेको छ।</p>`,
@@ -365,7 +493,7 @@ export const SUNSTAR_DATA = {
       time: "३२ मिनेट अघि",
       source: "SunstarNews.com",
       image:
-        "https://assets-cdn.ekantipur.com/uploads/source/news/kantipur/2026/miscellaneous/uchhenthe-prayer4-0192026123954-1000x0.jpg",
+        "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1000&auto=format&fit=crop&q=80",
       summary:
         "जलविद्युत्का लागि अर्बौं डलरको लगानी खन्याइँदै छ। तर स्थानीय बासिन्दा भन्छन्, उनीहरूकै भूमिमा बनाउने भनिएको परियोजनाबारे वास्तविक रूपमा उनीहरूलाई कहिल्यै सोधिएकै छैन।",
       content: `<p>अरुण उपत्यकामा ठूला जलविद्युत् आयोजना निर्माण भइरहँदा स्थानीय भोटे र राई समुदायका आदिवासीहरूले आफ्नो पुर्ख्यौली भूमिसँगको सम्बन्ध र वातावरणीय असरबारे चिन्ता व्यक्त गरेका छन्।</p>`,
@@ -379,7 +507,7 @@ export const SUNSTAR_DATA = {
       time: "३५ मिनेट अघि",
       source: "SunstarNews.com",
       image:
-        "https://assets-cdn.ekantipur.com/uploads/source/news/kantipur/2026/science-technology/telecom-1-0392026020428-1000x0.jpg",
+        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1000&auto=format&fit=crop&q=80",
       summary:
         "निरज भुसालले रातभर खटेर क्षतिको तथ्याङ्क, बेपत्ताको सूची र सरकारी राहतसम्बन्धी एकीकृत सूचना दिने एआई पोर्टल निर्माण गरेका छन्।",
       content: `<p>अर्थ मन्त्रालयमा कार्यरत युवा प्रविधि अध्येता निरज भुसालले एआई र गिटहब प्रविधिको सहायताले विपद् प्रभावित परिवारका लागि एकीकृत सूचना पोर्टल विकास गरेका हुन्।</p>`,
@@ -522,7 +650,7 @@ export const SUNSTAR_DATA = {
       categorySlug: "feature",
       time: "३५ मिनेट अघि",
       source: "Sunstar Feature",
-      image: "https://assets-cdn.ekantipur.com/uploads/source/news/kantipur/2026/miscellaneous/uchhenthe-prayer4-0192026123954-1000x0.jpg",
+      image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&auto=format&fit=crop&q=80",
       summary: "जलविद्युत्का लागि अर्बौं डलरको लगानी खन्याइँदै छ। तर स्थानीय बासिन्दा भन्छन्, उनीहरूकै भूमिमा बनाउने भनिएको परियोजनाबारे वास्तविक रूपमा उनीहरूलाई कहिल्यै सोधिएकै छैन।",
       content: "<p>जलविद्युत्का लागि अर्बौं डलरको लगानी खन्याइँदै छ। तर स्थानीय बासिन्दा भन्छन्, उनीहरूकै भूमिमा बनाउने भनिएको परियोजनाबारे वास्तविक रूपमा उनीहरूलाई कहिल्यै सोधिएकै छैन।</p>"
     },
@@ -1312,7 +1440,22 @@ export function getAllArticles(): Article[] {
 
 export function getArticleById(id: string): Article | undefined {
   const articles = getAllArticles();
-  return articles.find((a) => a.id === id);
+  const targetId = (id || '').trim().toLowerCase();
+  return articles.find((a) => 
+    a.id.toLowerCase() === targetId || 
+    (a as any).uuid?.toLowerCase() === targetId || 
+    (a as any).slug?.toLowerCase() === targetId
+  );
+}
+
+export function getAllRashifal(): RashifalItem[] {
+  return SUNSTAR_DATA.rashifal || [];
+}
+
+export function getRashifalById(id: string): RashifalItem | undefined {
+  const list = getAllRashifal();
+  return list.find((r) => r.id.toLowerCase() === id.toLowerCase() || r.sign.toLowerCase() === id.toLowerCase());
 }
 
 export default SUNSTAR_DATA;
+
