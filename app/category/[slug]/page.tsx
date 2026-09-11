@@ -6,8 +6,6 @@ import AdBanner from '@/components/molecules/AdBanner';
 import { getAllArticles } from '@/lib/data';
 import { getCategoryArticlesAsync } from '@/lib/article-data';
 
-export const dynamic = 'force-dynamic';
-
 interface Props {
   params: { slug: string };
 }

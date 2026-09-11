@@ -1,137 +1,78 @@
-# 🚀 Sunstar News (सनस्टार न्युज) - cPanel Deployment Guide
+# 🚀 Sunstar News - cPanel Complete Deployment Guide
+## Pure React.js Frontend + Laravel Backend + cPanel MySQL Database
 
-This guide provides step-by-step instructions for deploying the **Sunstar News Next.js Full-Stack Web Application** with a **MySQL / MariaDB Database** on **cPanel Web Hosting**.
-
----
-
-## 📋 Prerequisites
-1. **cPanel Account** with:
-   - **MySQL Databases** & **phpMyAdmin** access.
-   - **Setup Node.js App** (Phusion Passenger / CloudLinux Node Selector).
-   - **File Manager** or SSH terminal access.
-2. Node.js version **18.x or 20.x** enabled in cPanel.
+यस गाइडमा **cPanel** मा **Laravel Backend**, **cPanel MySQL Database**, र **Pure React Frontend** सजिलैसँग सेटअप गर्ने सम्पूर्ण विधि समावेश छ।
 
 ---
 
-## 🗄️ Step 1: Create MySQL Database & User in cPanel
+## 📂 १. तयार पारिएका २ वटा Zip फाइलहरू
 
-1. Log into your **cPanel Dashboard**.
-2. Go to **MySQL® Databases** (or **MySQL® Database Wizard**).
-3. **Create Database**:
-   - Database Name: `username_sunstardb` (e.g. `sunstar_news_db`).
-4. **Create Database User**:
-   - Username: `username_sunstaruser`
-   - Password: Choose a strong password and save it securely.
-5. **Add User to Database**:
-   - Select your user and database.
-   - Click **Add**.
-   - Check **ALL PRIVILEGES** and click **Make Changes**.
+1. **`dist.zip`** (४.६ MB) ➔ **Pure React Frontend** (HTML + CSS + JS) — `public_html/` मा जान्छ।
+2. **`backend.zip`** (२४ MB) ➔ **Laravel API Backend** (PHP + Composer Vendor समावेश भएको)।
+3. **`schema.sql`** ➔ **MySQL Database Table Structure & Data** (phpMyAdmin मा Import गर्न)।
 
 ---
 
-## 📥 Step 2: Import `schema.sql` via phpMyAdmin
+## 🛢️ २. cPanel मा MySQL Database बनाउने (१ मिनेट)
 
-1. In cPanel, click on **phpMyAdmin**.
-2. Select your newly created database (`username_sunstardb`) from the left menu.
-3. Click the **Import** tab at the top.
-4. Click **Choose File** and select [`schema.sql`](file:///Users/lionheart/Imstara/sunstar-news/schema.sql) from your project folder.
-5. Click **Import** (or **Go**).
-   - *This creates all tables (`users`, `categories`, `provinces`, `districts`, `articles`, `db_articles`, `banners`, `opinions`) and seeds initial admin accounts (`Sitaram` / `Sitaram@123`).*
-
----
-
-## ⚙️ Step 3: Setup Node.js App in cPanel
-
-1. In cPanel, search for **Setup Node.js App** and click it.
-2. Click **Create Application**.
-3. Fill in the following details:
-   - **Node.js version**: `18.x` or `20.x`
-   - **Application mode**: `Production`
-   - **Application root**: `sunstar-news` (folder name in File Manager)
-   - **Application URL**: `sunstarnews.com` (or your domain/subdomain)
-   - **Application startup file**: `server.js`
-4. Under **Environment Variables**, click **Add Variable** for each:
-   | Key | Value Example |
-   |---|---|
-   | `MYSQL_HOST` | `localhost` |
-   | `MYSQL_USER` | `username_sunstaruser` |
-   | `MYSQL_PASSWORD` | `YourDatabasePassword123!` |
-   | `MYSQL_DATABASE` | `username_sunstardb` |
-   | `MYSQL_PORT` | `3306` |
-   | `JWT_SECRET` | `sunstar-news-secure-jwt-secret-key-2026` |
-   | `NODE_ENV` | `production` |
-5. Click **Create**.
+1. cPanel मा लगइन गर्नुहोस्।
+2. **"MySQL® Database Wizard"** (वा **MySQL® Databases**) मा क्लिक गर्नुहोस्।
+3. **Database Name** राख्नुहोस्: उदा. `sunstar` (पूरा नाम `username_sunstar` बन्नेछ)।
+4. **Database User** बनाउनुहोस्: उदा. `dbuser` र सुरक्षित Password राख्नुहोस्।
+5. **"All Privileges"** मा टिक लगाएर **Make Changes** थिच्नुहोस्।
+6. अब cPanel को **"phpMyAdmin"** खोल्नुहोस्:
+   - बायाँतर्फ भर्खरै बनेको Database मा क्लिक गर्नुहोस्।
+   - माथिको **"Import"** ट्याबमा क्लिक गर्नुहोस्।
+   - **`schema.sql`** फाइल छानेर **Import / Go** थिच्नुहोस्।
+   - *बधाई छ! Users, Articles, Banners, Categories, Sessions, Cache लगायत सबै टेबलहरू बन्नेछन्। (Default Admin: `sitaram@sunstarnews.com` / `Sitaram@123`)*
 
 ---
 
-## 📁 Step 4: Upload Project Files to cPanel
+## ⚙️ ३. Laravel Backend cPanel मा राख्ने
 
-1. Build the application locally (or run on cPanel terminal):
-   ```bash
-   npm run build
+सबैभन्दा सुरक्षित र सफा तरिका:
+1. cPanel को **File Manager** खोल्नुहोस्।
+2. तपाईँको Home Directory (`/home/username/`) मा **`backend`** नामको नयाँ फोल्डर बनाउनुहोस् (यो `public_html` भन्दा बाहिर रहनेछ, जसले गर्दा Backend र Database Credentials पूर्ण सुरक्षित रहन्छन्)।
+3. त्यो `backend` फोल्डर भित्र **`backend.zip`** अपलोड गर्नुहोस् र **Extract** गर्नुहोस्।
+4. भित्र रहेको **`.env.cpanel`** फाइलको नाम परिवर्तन गरेर **`.env`** बनाउनुहोस् र त्यसमा आफ्नो Database विवरण भर्नुहोस्:
+   ```env
+   APP_NAME="Sunstar News API"
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://sunstarnews.com
+
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=username_sunstar
+   DB_USERNAME=username_dbuser
+   DB_PASSWORD=your_actual_db_password
+
+   SESSION_DRIVER=database
+   CACHE_STORE=database
+   FILESYSTEM_DISK=public
    ```
-2. Upload the following files/folders to your Application Root folder (`sunstar-news`) via cPanel **File Manager** or FTP/Git:
-   - `.next/` (The compiled Next.js build)
-   - `app/`
-   - `components/`
-   - `lib/`
-   - `public/`
-   - `package.json`
-   - `package-lock.json`
-   - `server.js`
-   - `next.config.mjs`
-   - `schema.sql`
-   - `tsconfig.json`
 
-*(Note: Do NOT upload `node_modules`. They will be installed on the cPanel server).*
+### 🔗 API Domain वा Subdomain Routing (२ विकल्पहरू):
+
+#### विकल्प क (सिफारिस गरिएको): Subdomain `api.sunstarnews.com`
+1. cPanel ➔ **"Domains"** ➔ **"Create A New Domain"** मा क्लिक गर्नुहोस्।
+2. Domain Name: `api.sunstarnews.com`
+3. Document Root: `backend/public` (वा `/home/username/backend/public`)
+4. Done! अब तपाईँको Laravel API `https://api.sunstarnews.com/api` मा चल्नेछ।
+
+#### विकल्प ख: Same Domain (सुन्दर व्यवस्था)
+यदि एउटै डोमेनमा राख्न चाहनुहुन्छ भने `public_html/api` फोल्डर बनाएर त्यसमा `backend/public/index.php` लाई पोइन्ट गर्न सक्नुहुन्छ।
 
 ---
 
-## 💻 Step 5: Install Dependencies & Run Server in cPanel
+## 🌐 ४. Pure React Frontend cPanel मा राख्ने (३० सेकेन्ड)
 
-1. In the cPanel **Node.js App** page, click **Run NPM Install** (or copy the virtualenv terminal command provided at the top of the page and run `npm install` in cPanel Terminal).
-2. Click **Restart Application**.
-
----
-
-## 🤖 Step 6: Setup GitHub Actions CI/CD (Auto-Deploy on Push)
-
-Whenever you push code changes to the `main` branch, GitHub Actions can automatically build your Next.js application and deploy it to cPanel!
-
-1. Go to your **GitHub Repository** -> **Settings** -> **Secrets and variables** -> **Actions**.
-2. Click **New repository secret** and add the following FTP secrets:
-
-| Secret Name | Description / Example |
-|---|---|
-| `CPANEL_FTP_SERVER` | Your server host / domain (e.g. `ftp.sunstarnews.com` or server IP) |
-| `CPANEL_FTP_USERNAME` | Your cPanel FTP username (e.g. `deployer@sunstarnews.com` or cPanel username) |
-| `CPANEL_FTP_PASSWORD` | Your FTP account password |
-| `CPANEL_TARGET_DIR` | Directory on cPanel where app is hosted (e.g. `/sunstar-news/` or `/public_html/`) |
-| `CPANEL_FTP_PORT` | `21` (default) or `22` for SFTP |
-
-3. Once secrets are added, push to `main`:
-   ```bash
-   git add .
-   git commit -m "Configure auto deployment to cPanel"
-   git push origin main
-   ```
-4. GitHub Actions will run the workflow defined in [`.github/workflows/deploy-cpanel.yml`](file:///Users/lionheart/Imstara/sunstar-news/.github/workflows/deploy-cpanel.yml), compile the Next.js app, upload updated files, and restart the cPanel Node.js server automatically!
-
----
-
-## 🔑 Default Administrator Credentials
-
-Once deployed, log into your admin panel at `https://yourdomain.com/login`:
-- **Username / Email**: `Sitaram` or `sitaram@sunstarnews.com`
-- **Password**: `Sitaram@123`
-- **Role**: ADMIN
-
----
-
-## 🛠️ Troubleshooting & Tips
-
-- **Database Connection Error**: Ensure `MYSQL_HOST` is set to `localhost` in cPanel. Ensure the database user has full privileges on the database.
-- **Port Conflict**: cPanel automatically assigns the `PORT` environment variable to `server.js`.
-- **Automatic App Restart**: Phusion Passenger automatically reloads the Node app when `tmp/restart.txt` is updated.
-- **Image Uploads**: Ensure the `public/` folder has write permissions if hosting local media files.
-
+1. cPanel File Manager मा गएर **`public_html`** खोल्नुहोस्।
+2. पुरानो कुनै पनि फोहोर फाइल (जस्तै `node_modules`, `server.js`, `__MACOSX`, पुरानो `dist` आदि) छ भने **Delete** गर्नुहोस्।
+3. **`dist.zip`** फाइललाई सिधै `public_html/` मा **Upload** गर्नुहोस्।
+4. `dist.zip` मा Right Click गरेर **Extract** गर्नुहोस्।
+   - यसले सिधै `index.html`, `_next/`, `assets/`, `.htaccess` निकाल्नेछ।
+5. अब ब्राउजरमा **`https://sunstarnews.com`** खोल्नुहोस्!
+   - कुनै पनि Node.js चलाउनु पर्दैन।
+   - साइट बिजुलीको गतिमा Pure React बाट चल्नेछ!

@@ -3,7 +3,7 @@ import { toNepaliRelativeTime } from '@/lib/nepaliDate';
 import fs from 'fs';
 import path from 'path';
 
-const LARAVEL_API_BASE = process.env.LARAVEL_API_BASE || 'http://127.0.0.1:8000/api';
+const LARAVEL_API_BASE = process.env.LARAVEL_API_BASE || process.env.NEXT_PUBLIC_API_URL || 'https://api.sunstarnews.com/api';
 
 function getArticlesCacheFilePath() {
   return path.join(process.cwd(), 'articles-cache.json');

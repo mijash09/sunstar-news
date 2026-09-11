@@ -1,0 +1,11 @@
+User-Agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /api/private
+
+User-Agent: Googlebot-News
+Allow: /
+Disallow: /dashboard
+
+Host: https://sunstarnews.com
+Sitemap: https://sunstarnews.com/sitemap.xml

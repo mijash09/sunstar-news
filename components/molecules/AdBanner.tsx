@@ -453,3 +453,6 @@ export default function AdBanner({
     </div>
   );
 }
+
+export const TopLevelBanner = AdBanner;
+

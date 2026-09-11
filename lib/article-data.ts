@@ -1,4 +1,3 @@
-import { sql } from '@/lib/db';
 import SUNSTAR_DATA, { Article, getAllArticles, getArticleById } from '@/lib/data';
 import { supplementWithDummy } from '@/lib/landing-data';
 import { getDbArticles } from '@/lib/articles-store';
@@ -26,7 +25,7 @@ export function getDummyFallbackArticle(id: string): Article {
   };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.sunstarnews.com/api";
 
 /**
  * Fetch a single article by ID with complete SSR support.
