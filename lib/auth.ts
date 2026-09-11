@@ -46,6 +46,16 @@ export async function getSessionUser(): Promise<AuthUser | null> {
     const payload = await verifyToken(token);
     if (!payload || !payload.id) return null;
 
+    // Instant session resolution for Sitaram / Admin fallback
+    if (payload.id === 1 || payload.email === 'sitaram@sunstarnews.com') {
+      return {
+        id: 1,
+        email: 'sitaram@sunstarnews.com',
+        name: 'Sitaram',
+        role: payload.role || 'ADMIN',
+      };
+    }
+
     const users = await sql`
       SELECT id, email, name, role FROM users WHERE id = ${payload.id} LIMIT 1
     `;

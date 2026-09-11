@@ -172,6 +172,57 @@ body {
     overflow-x: hidden;
 }
 
+/* ==========================================================================
+   INPUTS & TEXTAREAS - FORCE TEXT COLOR TO BLACK
+   ========================================================================== */
+input,
+textarea,
+select,
+.ant-input,
+.ant-input-affix-wrapper input,
+.ant-select-selection-item,
+.ant-select-item-option-content,
+.shadcn-input,
+.shadcn-textarea,
+.shadcn-md-textarea,
+.admin-input,
+.admin-search-input,
+input,
+textarea,
+select,
+.ant-input,
+.ant-input-affix-wrapper input,
+.ant-input-affix-wrapper,
+.ant-select-selection-item,
+.ant-select-item-option-content,
+.shadcn-input,
+.shadcn-textarea,
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .ant-input,
+[data-theme="dark"] .ant-input-affix-wrapper input,
+[data-theme="dark"] .ant-input-affix-wrapper,
+[data-theme="dark"] .ant-select-selection-item,
+[data-theme="dark"] .ant-select-item-option-content,
+[data-theme="dark"] .shadcn-input,
+[data-theme="dark"] .shadcn-textarea {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
+input::placeholder,
+textarea::placeholder,
+.ant-input::placeholder,
+.shadcn-input::placeholder,
+.shadcn-textarea::placeholder,
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder,
+[data-theme="dark"] .ant-input::placeholder {
+    color: #64748b !important;
+    -webkit-text-fill-color: #64748b !important;
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -484,26 +535,52 @@ button {
     display: flex;
     align-items: center;
     flex: 1;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent);
 }
-.stock-ticker-list::-webkit-scrollbar {
-    display: none;
+
+.stock-ticker-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: stockMarquee 45s linear infinite;
+    will-change: transform;
+}
+
+.stock-ticker-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes stockMarquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 .stock-ticker-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 2px 20px;
+    padding: 3px 22px;
     border-right: 1px solid var(--border-color, #eaeaea);
     white-space: nowrap;
     flex-shrink: 0;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    border-radius: 6px;
 }
 
-.stock-ticker-item:last-child {
-    border-right: none;
+.stock-ticker-item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .stock-ticker-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
 }
 
 .stock-company-name {
@@ -5045,4 +5122,14 @@ button {
 }
 .share-btn-hover:active {
     transform: translateY(0) scale(0.97) !important;
+}
+
+/* Footer Navigation Link Interactive Styles */
+.footer-nav-link {
+    transition: color 0.2s ease, transform 0.2s ease !important;
+    display: inline-block;
+}
+.footer-nav-link:hover {
+    color: var(--brand-orange, #f97316) !important;
+    transform: translateX(3px);
 }

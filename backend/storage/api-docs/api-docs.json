@@ -1,0 +1,1187 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Sunstar News API Documentation (सनस्टार न्युज)",
+        "description": "Complete RESTful & Real-Time API for Sunstar News Portal: Articles, Live NEPSE & Rashifal Scrapers, Media Uploads/Downloads, Advertisement Banners, Dashboard Stats & Staff Management.",
+        "contact": {
+            "name": "Sunstar Tech Team",
+            "email": "sitaram@sunstarnews.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Laravel Backend API Server"
+        },
+        {
+            "url": "http://localhost:3001",
+            "description": "Next.js Frontend Proxy Server"
+        }
+    ],
+    "paths": {
+        "/api/articles": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "List all articles with optional filtering",
+                "operationId": "93ded9e31119e6bbb22455c72ef97f19",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by category",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term in title or content",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of articles (default 20)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of articles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "count": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Create a new article",
+                "operationId": "75bdc5f953261e6f34852386c9b522c0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "नयाँ समाचार शीर्षक"
+                                    },
+                                    "category": {
+                                        "type": "string",
+                                        "example": "मुख्य समाचार"
+                                    },
+                                    "summary": {
+                                        "type": "string",
+                                        "example": "समाचार सारांश"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "समाचार विस्तृत सामग्री..."
+                                    },
+                                    "imageFiles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "imageUrl": {
+                                        "type": "string",
+                                        "example": "https://images.unsplash.com/photo-1544735716-392fe2489ffa"
+                                    },
+                                    "author": {
+                                        "type": "string",
+                                        "example": "सनस्टार संवाददाता"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Article created successfully"
+                    }
+                }
+            }
+        },
+        "/api/articles/{id}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Get single article by ID or slug",
+                "operationId": "a85697b2464e9aaa3f9980a83edbef88",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Article ID or slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article details"
+                    },
+                    "404": {
+                        "description": "Article not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Update existing article",
+                "operationId": "beb39fc2f8d02c16b41438aadbd9ba03",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Article ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article updated successfully"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Delete article",
+                "operationId": "804276a4147e577744e158b2ce2b58f8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Article ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article deleted successfully"
+                    }
+                }
+            }
+        },
+        "/api/share": {
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Increment article share counter",
+                "operationId": "df112bec6f3641b807a044c97d58074a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "articleId": {
+                                        "type": "string",
+                                        "example": "art-lead-1"
+                                    },
+                                    "platform": {
+                                        "type": "string",
+                                        "example": "facebook"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Share recorded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "shares_count": {
+                                            "type": "integer",
+                                            "example": 46
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "सेयर संख्या अद्यावधिक भयो!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/articles/{id}/like": {
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Toggle or increment article likes",
+                "operationId": "618cea81a0bc3473f33fd3524716b146",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Article ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "increment": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Like updated"
+                    }
+                }
+            }
+        },
+        "/api/articles/{id}/comments": {
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Add comment to an article",
+                "operationId": "69a081f0fffbcc8b96d0a84b5063d75e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Article ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "राम शर्मा"
+                                    },
+                                    "text": {
+                                        "type": "string",
+                                        "example": "धेरै राम्रो समाचार!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment added"
+                    }
+                }
+            }
+        },
+        "/api/banners": {
+            "get": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "List all advertisement banners",
+                "operationId": "9f718c7db0d13e4b5be26b80595f4cf1",
+                "parameters": [
+                    {
+                        "name": "position",
+                        "in": "query",
+                        "description": "Filter by position (e.g. header-top, sidebar)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of banners",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "count": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Create new banner advertisement",
+                "operationId": "546707dc3442c51e694ec312df3664e9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "नयाँ विज्ञापन"
+                                    },
+                                    "position": {
+                                        "type": "string",
+                                        "example": "header-top"
+                                    },
+                                    "targetUrl": {
+                                        "type": "string",
+                                        "example": "https://example.com"
+                                    },
+                                    "bannerFiles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "imageUrl": {
+                                        "type": "string",
+                                        "example": "https://images.unsplash.com/photo-1557804506-669a67965ba0"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Banner created"
+                    }
+                }
+            }
+        },
+        "/api/banners/{id}": {
+            "delete": {
+                "tags": [
+                    "Banners"
+                ],
+                "summary": "Delete banner advertisement",
+                "operationId": "00a27f787ec0124f0b98cfdeecf6090a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Banner ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Banner deleted"
+                    }
+                }
+            }
+        },
+        "/api/dashboard": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Fetch complete dashboard statistics, articles, banners, and users",
+                "operationId": "d5fcadff7c52501c317a59bc00886f22",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard data bundle",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "stats": {
+                                            "type": "object"
+                                        },
+                                        "articles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "banners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "users": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "breakingNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Multiplexed action handler for dashboard operations",
+                "operationId": "da28770cd1b6492820e71224399a9d06",
+                "requestBody": {
+                    "description": "Pass action or actionType with payload",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "example": "create-article"
+                                    },
+                                    "actionType": {
+                                        "type": "string",
+                                        "example": "create-article"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "category": {
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "summary": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "imageFiles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "avatarFiles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "bannerFiles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Action executed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "सफलतापूर्वक सम्पन्न भयो!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/landing-data": {
+            "get": {
+                "tags": [
+                    "Landing"
+                ],
+                "summary": "Fetch all categorized news, banners, and tickers for homepage rendering",
+                "operationId": "c85f682d6039915ffa83d3101f335690",
+                "responses": {
+                    "200": {
+                        "description": "Landing page grouped data bundle",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "featuredLead": {
+                                            "type": "object"
+                                        },
+                                        "topSecondaryLeads": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "exclusiveNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "politicsNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "businessNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "sportsNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "entertainmentNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "featureNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "technologyNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "worldNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "opinions": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "banners": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "breakingNews": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/upload": {
+            "post": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Upload image(s)",
+                "operationId": "192cfaab688caf692fd0cab6321caf9e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "Single image to upload",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "imageFiles": {
+                                        "description": "Multiple images to upload",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "example": "/storage/uploads/sample.jpg"
+                                        },
+                                        "full_url": {
+                                            "type": "string",
+                                            "example": "http://127.0.0.1:8000/storage/uploads/sample.jpg"
+                                        },
+                                        "filename": {
+                                            "type": "string",
+                                            "example": "sample.jpg"
+                                        },
+                                        "download_url": {
+                                            "type": "string",
+                                            "example": "/api/download/sample.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/download/{filename}": {
+            "get": {
+                "tags": [
+                    "Media"
+                ],
+                "summary": "Download image with attachment header",
+                "operationId": "2f10e72b4217927dd8e6e6e9c555dc22",
+                "parameters": [
+                    {
+                        "name": "filename",
+                        "in": "path",
+                        "description": "Name of the file to download",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File download attachment"
+                    },
+                    "404": {
+                        "description": "File not found"
+                    }
+                }
+            }
+        },
+        "/api/nepse": {
+            "get": {
+                "tags": [
+                    "Scrapers"
+                ],
+                "summary": "Fetch live NEPSE index, market turnover, gold, and forex rates",
+                "operationId": "259b85f807a03a1f3c2c882cb1cf47cf",
+                "responses": {
+                    "200": {
+                        "description": "Live market ticker data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "index": {
+                                            "type": "string",
+                                            "example": "2,594.18"
+                                        },
+                                        "change": {
+                                            "type": "string",
+                                            "example": "+14.32"
+                                        },
+                                        "percent": {
+                                            "type": "string",
+                                            "example": "+0.56%"
+                                        },
+                                        "turnover": {
+                                            "type": "string",
+                                            "example": "रु ४.६५ अर्ब"
+                                        },
+                                        "goldPrice": {
+                                            "type": "string",
+                                            "example": "रु १,५४,२०० / तोला"
+                                        },
+                                        "forexUSD": {
+                                            "type": "string",
+                                            "example": "रु १३५.१०"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rashifal": {
+            "get": {
+                "tags": [
+                    "Scrapers"
+                ],
+                "summary": "Fetch complete 12 zodiac daily horoscope (Rashifal)",
+                "operationId": "4acefeca037e5e3e0d22e97a6b1c1ade",
+                "responses": {
+                    "200": {
+                        "description": "12 zodiac signs daily horoscope",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "example": "mesh"
+                                            },
+                                            "sign": {
+                                                "type": "string",
+                                                "example": "मेष"
+                                            },
+                                            "latinName": {
+                                                "type": "string",
+                                                "example": "Aries"
+                                            },
+                                            "symbol": {
+                                                "type": "string",
+                                                "example": "♈"
+                                            },
+                                            "prediction": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List all staff users",
+                "operationId": "566aed8efb436ca506e0ef51a032ecd9",
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create new staff user",
+                "operationId": "be551c1d694a01c164966f58bfa77013",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "नयाँ कर्मचारी"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "staff@sunstar.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "EDITOR"
+                                    },
+                                    "avatarFiles": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    }
+                }
+            }
+        },
+        "/api/users/{id}": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update staff user role or profile",
+                "operationId": "070e37fc9aff78ae73860751bc990ed3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "ADMIN"
+                                    },
+                                    "avatar": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User updated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete staff user",
+                "operationId": "0b4133ed462528a5e648b88ead11e929",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted"
+                    }
+                }
+            }
+        },
+        "/api/nepse/live": {
+            "get": {
+                "tags": [
+                    "Scrapers"
+                ],
+                "summary": "Execute NEPSE live scraper directly via Node Process in Laravel",
+                "operationId": "587499d5f842021f39528b14247b70a5",
+                "responses": {
+                    "200": {
+                        "description": "Scraped live NEPSE market, gold, and forex data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "index": {
+                                            "type": "string",
+                                            "example": "2,531.55"
+                                        },
+                                        "change": {
+                                            "type": "string",
+                                            "example": "-13.85"
+                                        },
+                                        "percent": {
+                                            "type": "string",
+                                            "example": "-0.54%"
+                                        },
+                                        "turnover": {
+                                            "type": "string",
+                                            "example": "रु 4.00 अर्ब"
+                                        },
+                                        "goldPrice": {
+                                            "type": "string",
+                                            "example": "रु 3,05,800 / तोला"
+                                        },
+                                        "forexUSD": {
+                                            "type": "string",
+                                            "example": "रु १५३.०१"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "CLOSE"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve NEPSE data"
+                    }
+                }
+            }
+        },
+        "/api/rashifal/daily": {
+            "get": {
+                "tags": [
+                    "Scrapers"
+                ],
+                "summary": "Execute Hamro Patro scraper directly via Node Process in Laravel",
+                "operationId": "bf16f719bd17c89767445502b42efb3f",
+                "responses": {
+                    "200": {
+                        "description": "Scraped daily horoscope raw data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve data"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Articles",
+            "description": "Article Management, Interactions, Comments & Share Endpoints"
+        },
+        {
+            "name": "Banners",
+            "description": "Advertisement Banner Management Endpoints"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Admin Dashboard Management, Stats, and Multiplexed Action Endpoints"
+        },
+        {
+            "name": "Landing",
+            "description": "Homepage / Landing Page Data Aggregation"
+        },
+        {
+            "name": "Media",
+            "description": "Media Upload & Download Endpoints"
+        },
+        {
+            "name": "Scrapers",
+            "description": "Live Financial (NEPSE) and Daily Horoscope (Rashifal) Scrapers"
+        },
+        {
+            "name": "Users",
+            "description": "User & Staff Management Endpoints"
+        }
+    ]
+}

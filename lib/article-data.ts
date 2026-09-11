@@ -2,6 +2,7 @@ import { sql } from '@/lib/db';
 import SUNSTAR_DATA, { Article, getAllArticles, getArticleById } from '@/lib/data';
 import { supplementWithDummy } from '@/lib/landing-data';
 import { getDbArticles } from '@/lib/articles-store';
+import { toNepaliRelativeTime } from '@/lib/nepaliDate';
 
 export function getDummyFallbackArticle(id: string): Article {
   const cleanId = id.replace(/-/g, ' ');
@@ -25,38 +26,89 @@ export function getDummyFallbackArticle(id: string): Article {
   };
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+
 /**
  * Fetch a single article by ID with complete SSR support.
- * Tries DB & file store first, falls back to static dataset, and then fallback dummy data.
+ * Tries the single GET API (/api/articles/{id}) first, then DB/file store, static dataset, and fallback.
  */
 export async function getArticleByIdAsync(id: string): Promise<Article> {
   if (!id) return getDummyFallbackArticle('unknown');
 
-  const cleanId = id.trim().toLowerCase();
+  const cleanId = id.trim();
 
-  // 1. Try DB & persistent file store fetch first
+  // 1. Single GET API call (/api/articles/{id})
+  try {
+    const res = await fetch(`${API_URL}/articles/${encodeURIComponent(cleanId)}`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.success && json.data) {
+        const d = json.data;
+        return {
+          id: d.id,
+          title: d.title,
+          slug: d.slug,
+          category: d.category || 'मुख्य समाचार',
+          categories: d.categories || [d.category || 'मुख्य समाचार'],
+          summary: d.summary || d.title,
+          content: d.content || d.summary || d.title,
+          image: d.image || '/assets/sunstar-logo.jpg',
+          images: Array.isArray(d.images) && d.images.length > 0 ? d.images : [d.image || '/assets/sunstar-logo.jpg'],
+          author: d.author || 'सनस्टार संवाददाता',
+          author_role: d.author_role,
+          authorRole: d.author_role || d.authorRole || 'वरिष्ठ संवाददाता',
+          author_image: d.author_image,
+          authorImage: d.author_image || d.authorImage || d.image,
+          read_time: d.read_time,
+          readTime: d.read_time || d.readTime,
+          source: d.source || 'SunstarNews.com',
+          time: (d.updated_at || d.created_at) ? toNepaliRelativeTime(d.updated_at || d.created_at) : (d.time || 'भर्खरै'),
+          updated_at: d.updated_at,
+          created_at: d.created_at,
+          views: d.views || '१.२ के',
+          viewsCount: d.viewsCount ?? d.views_count ?? 0,
+          likesCount: d.likesCount ?? d.likes_count ?? 12,
+          sharesCount: d.sharesCount ?? d.shares_count ?? 0,
+          commentsCount: d.commentsCount ?? d.comments_count ?? (Array.isArray(d.commentsList || d.comments_list) ? (d.commentsList || d.comments_list).length : 0),
+          commentsList: d.commentsList ?? d.comments_list ?? [],
+          isPublished: d.is_published ?? true,
+          isFeatured: d.is_featured ?? false,
+          isExclusive: d.is_exclusive ?? false,
+          province: d.province ?? null,
+          tags: d.tags ?? [],
+        };
+      }
+    }
+  } catch (err) {
+    console.warn(`Single GET API fetch error for article ${id}:`, (err as any)?.message || err);
+  }
+
+  // 2. Try DB & persistent file store fetch
   try {
     const allDbArticles = await getDbArticles();
     const found = allDbArticles.find(
       (art) =>
-        art.id.toLowerCase() === cleanId ||
-        (art as any).uuid?.toLowerCase() === cleanId ||
-        art.title.toLowerCase().includes(cleanId)
+        art.id.toLowerCase() === cleanId.toLowerCase() ||
+        (art as any).uuid?.toLowerCase() === cleanId.toLowerCase() ||
+        art.title.toLowerCase().includes(cleanId.toLowerCase())
     );
     if (found) {
       return found;
     }
   } catch (err) {
-    console.warn(`Fetch error for article ${id}:`, (err as any)?.message || err);
+    // fallback
   }
 
-  // 2. Try static data lookup
+  // 3. Try static data lookup
   const staticFound = getArticleById(id);
   if (staticFound) {
     return staticFound;
   }
 
-  // 3. Fallback dummy article
+  // 4. Fallback dummy article
   return getDummyFallbackArticle(id);
 }
 

@@ -139,16 +139,16 @@ export default function Footer({ onOpenSearch }: { onOpenSearch?: () => void }) 
               मुख्य समाचार विधाहरू
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.88rem' }}>
-              <li><Link href="/" style={{ color: '#CBD5E1', textDecoration: 'none' }}>मुख्य समाचार</Link></li>
-              <li><Link href="/category/politics" style={{ color: '#CBD5E1', textDecoration: 'none' }}>राजनीति</Link></li>
-              <li><Link href="/category/business" style={{ color: '#CBD5E1', textDecoration: 'none' }}>अर्थ / वाणिज्य</Link></li>
-              <li><Link href="/category/exclusive" style={{ color: '#CBD5E1', textDecoration: 'none' }}>विशेष एक्सक्लुसिभ</Link></li>
-              <li><Link href="/category/pradesh" style={{ color: '#CBD5E1', textDecoration: 'none' }}>प्रदेश समाचार</Link></li>
-              <li><Link href="/category/opinion" style={{ color: '#CBD5E1', textDecoration: 'none' }}>विचार / ब्लग</Link></li>
-              <li><Link href="/category/entertainment" style={{ color: '#CBD5E1', textDecoration: 'none' }}>मनोरञ्जन</Link></li>
-              <li><Link href="/category/sports" style={{ color: '#CBD5E1', textDecoration: 'none' }}>खेलकुद</Link></li>
-              <li><Link href="/category/technology" style={{ color: '#CBD5E1', textDecoration: 'none' }}>प्रविधि</Link></li>
-              <li><Link href="/category/world" style={{ color: '#CBD5E1', textDecoration: 'none' }}>विश्व समाचार</Link></li>
+              <li><Link href="/" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>मुख्य समाचार</Link></li>
+              <li><Link href="/category/politics" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>राजनीति</Link></li>
+              <li><Link href="/category/business" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>अर्थ / वाणिज्य</Link></li>
+              <li><Link href="/category/exclusive" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>विशेष एक्सक्लुसिभ</Link></li>
+              <li><Link href="/category/pradesh" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>प्रदेश समाचार</Link></li>
+              <li><Link href="/category/opinion" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>विचार / ब्लग</Link></li>
+              <li><Link href="/category/entertainment" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>मनोरञ्जन</Link></li>
+              <li><Link href="/category/sports" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>खेलकुद</Link></li>
+              <li><Link href="/category/technology" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>प्रविधि</Link></li>
+              <li><Link href="/category/world" className="footer-nav-link" style={{ color: '#CBD5E1', textDecoration: 'none', transition: 'color 0.2s ease' }}>विश्व समाचार</Link></li>
             </ul>
           </div>
 
@@ -164,14 +164,15 @@ export default function Footer({ onOpenSearch }: { onOpenSearch?: () => void }) 
                 </Link>
               </li>
               <li>
-                <a href="#nepse" style={{ color: '#CBD5E1', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Link href="/#nepse" style={{ color: '#CBD5E1', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', transition: 'color 0.2s ease' }}>
                   📈 नेप्से सेयर बजार लाइभ (NEPSE)
-                </a>
+                </Link>
               </li>
               <li>
                 <button
+                  type="button"
                   onClick={() => alert('सनस्टार ई-पेपर संस्करण शीघ्र उपलब्ध हुँदैछ!')}
-                  style={{ background: 'none', border: 'none', color: '#CBD5E1', cursor: 'pointer', padding: 0, font: 'inherit' }}
+                  style={{ background: 'none', border: 'none', color: '#CBD5E1', cursor: 'pointer', padding: 0, font: 'inherit', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
                   📰 डिजिटल ई-पेपर संस्करण
                 </button>
@@ -269,8 +270,8 @@ export default function Footer({ onOpenSearch }: { onOpenSearch?: () => void }) 
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Link href="/" style={{ color: '#94A3B8', textDecoration: 'none' }}>गोपनीयता नीति</Link>
-            <Link href="/" style={{ color: '#94A3B8', textDecoration: 'none' }}>उपयोगका शर्तहरू</Link>
+            <Link href="/privacy" className="footer-nav-link" style={{ color: '#94A3B8', textDecoration: 'none', transition: 'color 0.2s ease' }}>गोपनीयता नीति</Link>
+            <Link href="/terms" className="footer-nav-link" style={{ color: '#94A3B8', textDecoration: 'none', transition: 'color 0.2s ease' }}>उपयोगका शर्तहरू</Link>
             <button
               onClick={scrollToTop}
               style={{

@@ -139,12 +139,14 @@ export default function RootLayout({
   return (
     <html lang="ne">
       <head>
-        <link rel="icon" type="image/jpeg" href="/assets/sunstar-logo.jpg" />
+        <link key="site-icon" rel="icon" type="image/jpeg" href="/assets/sunstar-logo.jpg" />
         <script
+          key="jsonld-org"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
         />
         <script
+          key="jsonld-website"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
         />
