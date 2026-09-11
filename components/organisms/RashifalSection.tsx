@@ -8,7 +8,6 @@ export default function RashifalSection() {
   const [selectedSign, setSelectedSign] = useState(null);
   const [rashifalList, setRashifalList] = useState(SUNSTAR_DATA.rashifal || []);
   const [liveDate, setLiveDate] = useState(SUNSTAR_DATA.rashifalDate);
-  const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
     fetch('/api/rashifal')
@@ -19,7 +18,6 @@ export default function RashifalSection() {
           if (data.date) {
             setLiveDate(data.date);
           }
-          setIsLive(true);
         }
       })
       .catch((err) => console.warn('Live rashifal fallback:', err));

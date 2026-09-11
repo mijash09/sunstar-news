@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Article;
+use App\Services\FileUploadService;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
@@ -137,26 +138,27 @@ class ArticleController extends Controller
             $files = $request->file('imageFiles');
             if (!is_array($files)) $files = [$files];
             foreach ($files as $file) {
-                if ($file && $file->isValid()) {
-                    $ext = $file->getClientOriginalExtension() ?: 'jpg';
-                    $cleanName = Str::random(24) . '.' . $ext;
-                    $path = $file->storeAs('uploads', $cleanName, 'public');
-                    $imagesList[] = '/storage/' . $path;
-                }
+                $saved = FileUploadService::saveFile($file);
+                if ($saved) $imagesList[] = $saved;
             }
         } elseif ($request->hasFile('imageFile') || $request->hasFile('file') || $request->hasFile('image')) {
             $file = $request->file('imageFile') ?: ($request->file('file') ?: $request->file('image'));
-            if ($file && $file->isValid()) {
-                $ext = $file->getClientOriginalExtension() ?: 'jpg';
-                $cleanName = Str::random(24) . '.' . $ext;
-                $path = $file->storeAs('uploads', $cleanName, 'public');
-                $imagesList[] = '/storage/' . $path;
-            }
+            $saved = FileUploadService::saveFile($file);
+            if ($saved) $imagesList[] = $saved;
         }
 
-        $rawImageUrl = $request->input('imageUrl') ?: $request->input('image');
-        if (empty($imagesList) && !empty($rawImageUrl) && !str_starts_with($rawImageUrl, '[object')) {
-            $imagesList[] = $rawImageUrl;
+        $rawImageUrl = trim((string)($request->input('imageUrl') ?: $request->input('image')));
+        if (!empty($rawImageUrl)) {
+            $urlParts = preg_split('/[\r\n,]+/', $rawImageUrl);
+            foreach ($urlParts as $p) {
+                $p = trim($p);
+                if (FileUploadService::isValidImageUrl($p)) {
+                    $norm = FileUploadService::normalizeUrl($p);
+                    if (!in_array($norm, $imagesList, true)) {
+                        $imagesList[] = $norm;
+                    }
+                }
+            }
         }
 
         if (empty($imagesList)) {
@@ -203,15 +205,15 @@ class ArticleController extends Controller
         $authorImage = null;
         if ($request->hasFile('authorAvatarFile') || $request->hasFile('authorImageFile')) {
             $avatarFile = $request->file('authorAvatarFile') ?: $request->file('authorImageFile');
-            if ($avatarFile && $avatarFile->isValid()) {
-                $ext = $avatarFile->getClientOriginalExtension() ?: 'jpg';
-                $cleanName = 'author_' . Str::random(20) . '.' . $ext;
-                $path = $avatarFile->storeAs('uploads', $cleanName, 'public');
-                $authorImage = '/storage/' . $path;
+            if ($avatarFile) {
+                $authorImage = FileUploadService::saveFile($avatarFile, 'author');
             }
         }
         if (!$authorImage) {
-            $authorImage = $request->input('authorImage') ?: $request->input('author_image');
+            $rawAuthorImg = $request->input('authorImage') ?: $request->input('author_image');
+            if (FileUploadService::isValidImageUrl($rawAuthorImg)) {
+                $authorImage = FileUploadService::normalizeUrl($rawAuthorImg);
+            }
         }
         $authorRole = $request->input('authorRole') ?: $request->input('author_role');
         $readTime = $request->input('readTime') ?: $request->input('read_time');
@@ -281,14 +283,15 @@ class ArticleController extends Controller
         }
         if ($request->hasFile('authorAvatarFile') || $request->hasFile('authorImageFile')) {
             $avatarFile = $request->file('authorAvatarFile') ?: $request->file('authorImageFile');
-            if ($avatarFile && $avatarFile->isValid()) {
-                $ext = $avatarFile->getClientOriginalExtension() ?: 'jpg';
-                $cleanName = 'author_' . Str::random(20) . '.' . $ext;
-                $path = $avatarFile->storeAs('uploads', $cleanName, 'public');
-                $article->author_image = '/storage/' . $path;
+            if ($avatarFile) {
+                $savedAvatar = FileUploadService::saveFile($avatarFile, 'author');
+                if ($savedAvatar) $article->author_image = $savedAvatar;
             }
         } elseif ($request->filled('authorImage') || $request->filled('author_image')) {
-            $article->author_image = $request->input('authorImage') ?: $request->input('author_image');
+            $rawAuthorImg = $request->input('authorImage') ?: $request->input('author_image');
+            if (FileUploadService::isValidImageUrl($rawAuthorImg)) {
+                $article->author_image = FileUploadService::normalizeUrl($rawAuthorImg);
+            }
         }
         if ($request->filled('likesCount')) $article->likes_count = (int) $request->input('likesCount');
 
@@ -322,7 +325,7 @@ class ArticleController extends Controller
             }
         }
         foreach ($request->allFiles() as $key => $fileOrArray) {
-            if ($key === 'imageFiles' || $key === 'avatarFiles' || $key === 'bannerFiles') continue;
+            if ($key === 'imageFiles' || $key === 'avatarFiles' || $key === 'bannerFiles' || $key === 'authorAvatarFile' || $key === 'authorImageFile') continue;
             if (str_contains($key, 'image') || str_contains($key, 'file') || str_contains($key, 'photo')) {
                 if (is_array($fileOrArray)) {
                     foreach ($fileOrArray as $f) {
@@ -335,22 +338,23 @@ class ArticleController extends Controller
         }
 
         foreach ($uploadedFiles as $file) {
-            if ($file && $file->isValid()) {
-                $ext = $file->getClientOriginalExtension() ?: 'jpg';
-                $cleanName = Str::random(24) . '.' . $ext;
-                $path = $file->storeAs('uploads', $cleanName, 'public');
-                $newImages[] = '/storage/' . $path;
+            $saved = FileUploadService::saveFile($file);
+            if ($saved) {
+                $newImages[] = $saved;
             }
         }
 
         // 2. Direct imageUrl input (support single, comma-separated, or newline-separated URLs)
         $rawImageUrl = trim((string)($request->input('imageUrl') ?: $request->input('image')));
-        if (!empty($rawImageUrl) && !str_starts_with($rawImageUrl, '[object')) {
+        if (!empty($rawImageUrl)) {
             $urlParts = preg_split('/[\r\n,]+/', $rawImageUrl);
             foreach ($urlParts as $p) {
                 $p = trim($p);
-                if (!empty($p) && !in_array($p, $newImages, true)) {
-                    $newImages[] = $p;
+                if (FileUploadService::isValidImageUrl($p)) {
+                    $norm = FileUploadService::normalizeUrl($p);
+                    if (!in_array($norm, $newImages, true)) {
+                        $newImages[] = $norm;
+                    }
                 }
             }
         }
@@ -373,7 +377,7 @@ class ArticleController extends Controller
                 : [$article->image ?: '/assets/sunstar-logo.jpg'];
         }
 
-        $retained = array_values(array_filter((array)$retained, fn($img) => !empty($img) && is_string($img)));
+        $retained = array_values(array_filter((array)$retained, fn($img) => FileUploadService::isValidImageUrl($img)));
 
         // 4. Merge retained and new images
         if (!empty($newImages) || $request->has('retainedImages')) {

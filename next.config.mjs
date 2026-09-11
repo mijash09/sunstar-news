@@ -2,7 +2,7 @@
 const isDev = process.env.NODE_ENV === 'development';
 
 const nextConfig = {
-  ...(isDev ? {} : { output: 'export', distDir: 'dist' }),
+  ...(isDev ? {} : { output: 'export' }),
   trailingSlash: true,
   images: {
     unoptimized: true,

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import SUNSTAR_DATA from '@/lib/data';
 
-export default function Footer({ onOpenSearch }: { onOpenSearch?: () => void }) {
+export default function Footer({ onOpenSearch: _onOpenSearch }: { onOpenSearch?: () => void }) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

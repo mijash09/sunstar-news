@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Banner;
+use App\Services\FileUploadService;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
@@ -90,11 +91,8 @@ class BannerController extends Controller
         if (!empty($files)) {
             $total = count($files);
             foreach ($files as $idx => $file) {
-                if ($file && $file->isValid()) {
-                    $ext = $file->getClientOriginalExtension() ?: 'jpg';
-                    $cleanName = Str::random(24) . '.' . $ext;
-                    $path = $file->storeAs('uploads', $cleanName, 'public');
-                    $storedUrl = '/storage/' . $path;
+                $storedUrl = FileUploadService::saveFile($file, 'banner');
+                if ($storedUrl) {
                     $bTitle = $total > 1 ? (($title ?: 'विज्ञापन ब्यानर') . ' (' . ($idx + 1) . ')') : ($title ?: 'विज्ञापन ब्यानर');
                     $banner = Banner::create([
                         'id' => 'banner-' . time() . '-' . Str::random(5),
@@ -108,12 +106,12 @@ class BannerController extends Controller
                     $createdBanners[] = $banner;
                 }
             }
-        } elseif (!empty($imageUrl)) {
+        } elseif (!empty($imageUrl) && FileUploadService::isValidImageUrl($imageUrl)) {
             $banner = Banner::create([
                 'id' => 'banner-' . time() . '-' . Str::random(5),
                 'title' => $title ?: 'विज्ञापन ब्यानर',
                 'position' => $position,
-                'image_url' => $imageUrl,
+                'image_url' => FileUploadService::normalizeUrl($imageUrl),
                 'target_url' => $targetUrl,
                 'is_active' => true,
                 'clicks_count' => 0,

@@ -33,7 +33,7 @@ export function supplementWithDummy<T>(
 export async function getDbBanners(): Promise<BannerAd[]> {
   try {
     const res = await fetch(`${API_URL}/banners`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
       headers: { 'Accept': 'application/json' },
     });
     if (res.ok) {

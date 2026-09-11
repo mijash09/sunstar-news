@@ -2,7 +2,6 @@
 
 import React from 'react';
 import SectionHeader from '@/components/molecules/SectionHeader';
-import Badge from '@/components/atoms/Badge';
 import { Article } from '@/lib/data';
 
 interface InterviewGridSectionProps {

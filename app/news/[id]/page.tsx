@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import SingleArticleClient from '@/components/organisms/SingleArticleClient';
 import { getAllArticles } from '@/lib/data';
-import { getArticleByIdAsync, getDummyFallbackArticle } from '@/lib/article-data';
+import { getArticleByIdAsync } from '@/lib/article-data';
 import { getDbBanners } from '@/lib/landing-data';
 
 export function generateStaticParams() {

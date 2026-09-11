@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
@@ -33,8 +34,8 @@ class MediaController extends Controller
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "url", type: "string", example: "/storage/uploads/sample.jpg"),
-                        new OA\Property(property: "full_url", type: "string", example: "http://127.0.0.1:8000/storage/uploads/sample.jpg"),
+                        new OA\Property(property: "url", type: "string", example: "https://api.sunstarnews.com/uploads/sample.jpg"),
+                        new OA\Property(property: "full_url", type: "string", example: "https://api.sunstarnews.com/uploads/sample.jpg"),
                         new OA\Property(property: "filename", type: "string", example: "sample.jpg"),
                         new OA\Property(property: "download_url", type: "string", example: "/api/download/sample.jpg")
                     ]
@@ -44,56 +45,67 @@ class MediaController extends Controller
     )]
     public function upload(Request $request)
     {
-        $uploadedUrls = [];
-        $firstFilename = '';
+        try {
+            $uploadedUrls = [];
+            $firstFilename = '';
 
-        $files = [];
-        if ($request->hasFile('file')) $files[] = $request->file('file');
-        if ($request->hasFile('image')) $files[] = $request->file('image');
-        if ($request->hasFile('imageFiles')) {
-            $fList = $request->file('imageFiles');
-            $files = array_merge($files, is_array($fList) ? $fList : [$fList]);
-        }
-        if ($request->hasFile('avatarFiles')) {
-            $fList = $request->file('avatarFiles');
-            $files = array_merge($files, is_array($fList) ? $fList : [$fList]);
-        }
-        if ($request->hasFile('bannerFiles')) {
-            $fList = $request->file('bannerFiles');
-            $files = array_merge($files, is_array($fList) ? $fList : [$fList]);
-        }
+            $files = [];
+            if ($request->hasFile('file')) $files[] = $request->file('file');
+            if ($request->hasFile('image')) $files[] = $request->file('image');
+            if ($request->hasFile('imageFiles')) {
+                $fList = $request->file('imageFiles');
+                $files = array_merge($files, is_array($fList) ? $fList : [$fList]);
+            }
+            if ($request->hasFile('avatarFiles')) {
+                $fList = $request->file('avatarFiles');
+                $files = array_merge($files, is_array($fList) ? $fList : [$fList]);
+            }
+            if ($request->hasFile('bannerFiles')) {
+                $fList = $request->file('bannerFiles');
+                $files = array_merge($files, is_array($fList) ? $fList : [$fList]);
+            }
 
-        if (empty($files)) {
-            return response()->json([
-                'success' => false,
-                'error' => 'No files uploaded.'
-            ], 400);
-        }
+            if (empty($files)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'कृपया अपलोड गर्नका लागि कम्तीमा एउटा फोटो छान्नुहोस् (No files uploaded).'
+                ], 400);
+            }
 
-        foreach ($files as $file) {
-            if ($file && $file->isValid()) {
-                $extension = $file->getClientOriginalExtension() ?: 'jpg';
-                $cleanName = Str::random(24) . '.' . $extension;
-                $path = $file->storeAs('uploads', $cleanName, 'public');
-                $relativeUrl = '/storage/' . $path;
-                $uploadedUrls[] = $relativeUrl;
-                if (!$firstFilename) {
-                    $firstFilename = $cleanName;
+            foreach ($files as $file) {
+                $url = FileUploadService::saveFile($file);
+                if ($url) {
+                    $uploadedUrls[] = $url;
+                    if (!$firstFilename) {
+                        $firstFilename = basename($url);
+                    }
                 }
             }
+
+            if (empty($uploadedUrls)) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'तस्बिर अपलोड हुन सकेन। कृपया फेरि प्रयास गर्नुहोस्।'
+                ], 500);
+            }
+
+            $primaryUrl = $uploadedUrls[0];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'तस्बिर सफलतापूर्वक अपलोड भयो!',
+                'url' => $primaryUrl,
+                'full_url' => $primaryUrl,
+                'filename' => $firstFilename,
+                'download_url' => '/api/download/' . $firstFilename,
+                'urls' => $uploadedUrls,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'त्रुटि (Error): ' . $e->getMessage()
+            ], 500);
         }
-
-        $primaryUrl = $uploadedUrls[0] ?? '/assets/sunstar-logo.jpg';
-
-        return response()->json([
-            'success' => true,
-            'message' => 'तस्बिर सफलतापूर्वक अपलोड भयो!',
-            'url' => $primaryUrl,
-            'full_url' => url($primaryUrl),
-            'filename' => $firstFilename,
-            'download_url' => '/api/download/' . $firstFilename,
-            'urls' => $uploadedUrls,
-        ]);
     }
 
     #[OA\Get(
@@ -117,13 +129,15 @@ class MediaController extends Controller
     public function download($filename)
     {
         $cleanFilename = basename($filename);
-        $path = storage_path('app/public/uploads/' . $cleanFilename);
+        $path = public_path('uploads/' . $cleanFilename);
+        if (!file_exists($path)) {
+            $path = storage_path('app/public/uploads/' . $cleanFilename);
+        }
+        if (!file_exists($path)) {
+            $path = public_path('assets/' . $cleanFilename);
+        }
 
         if (!file_exists($path)) {
-            $fallbackPath = public_path('assets/' . $cleanFilename);
-            if (file_exists($fallbackPath)) {
-                return response()->download($fallbackPath, $cleanFilename);
-            }
             return response()->json([
                 'success' => false,
                 'error' => 'फाइल भेटिएन (File not found)'

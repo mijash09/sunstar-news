@@ -6,7 +6,6 @@ import SUNSTAR_DATA, { BannerAd } from '@/lib/data';
 import WeatherWidget from '@/components/molecules/WeatherWidget';
 import LiveDateBadge from '@/components/molecules/LiveDateBadge';
 import Button from '@/components/atoms/Button';
-import Badge from '@/components/atoms/Badge';
 import { TopLevelBanner } from '@/components/molecules/AdBanner';
 
 export default function Header({

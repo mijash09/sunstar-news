@@ -104,16 +104,43 @@ graph TD
 
 ---
 
-## 🔄 ५. भविष्यमा अपडेट गर्दा के गर्ने? (Maintenance & Updates)
+## 🖼️ ५. तस्बिर अपलोड प्रणाली र cPanel समस्या समाधान (Media Upload Architecture)
 
-### क) Frontend मा डिजाइन वा कोड फेरिएमा:
-1. कम्प्युटरको टर्मिनलमा `npm run build:dist` चलाउने।
-2. तयार भएको नयाँ `dist.zip` लाई cPanel को `public_html` मा अपलोड गरी Extract गर्ने (३० सेकेन्ड)।
+### समस्याको कारण (Root Cause of Previous Failure):
+१. **Symlink समस्या**: म्याकमा बनाइएको `public/storage` सिम्बोलिक लिंक cPanel लिनक्स सर्भरमा काम गर्दैनथ्यो वा टुटेको थियो।
+२. **Laravel storeAs 500 Error**: `storeAs('uploads', ..., 'public')` ले `storage/app/public/uploads` मा लेख्न खोज्थ्यो जुन cPanel मा डाइरेक्ट्री अनुमति नहुँदा 500 Server Error दिन्थ्यो।
+३. **डमी टेक्स्ट भ्यालिडेसन**: फर्म भर्दा डमी टेक्स्ट (जस्तै `"Ut consequatur hic"`) इमेज लिङ्कका रूपमा जाँदा गलत स्ट्रिङ सेभ भइरहेको थियो।
 
-### ख) Database मा नयाँ कलम (Column) थपिएमा:
+### समाधान (Permanent Fix Implemented):
+१. **Direct Physical Storage (`FileUploadService`)**:
+   - फोटोहरू सिधै **`backend/public/uploads/`** मा सेभ हुन्छन्।
+   - कुनै पनि `storage:link` वा `symlink` को आवश्यकता **पर्दैन**!
+   - LiteSpeed / Apache ले ती तस्बिरहरूलाई कुनै पनि PHP कोड लोड नगरिकन सिधै **हाई-स्पिड स्टाटिक फाइल**को रूपमा `200 OK` मा पठाउँछ।
+२. **Absolute URL Generation**:
+   - हरेक अपलोड गरिएको तस्बिरको पूर्ण URL बन्छ: `https://api.sunstarnews.com/uploads/filename.jpg`
+   - यो URL मुख्य वेबसाइट (`sunstarnews.com`), ड्यासबोर्ड र फेसबुक/व्हाट्सएप सेयरिङ सबै ठाउँमा तुरुन्त खुल्छ।
+३. **URL Validation & Fallback**:
+   - `http://`, `https://`, वा `/` नभएका कुनै पनि डमी टेक्स्टलाई स्वचालित रूपमा हटाएर हाइ-क्वालिटी कभर इमेज राखिन्छ।
+४. **`.htaccess` 307 Redirect**:
+   - `sunstarnews.com/uploads/...` वा `sunstarnews.com/storage/...` मा रिक्वेस्ट आएमा Apache ले सिधै `https://api.sunstarnews.com/...` मा रिडाइरेक्ट गरिदिन्छ।
+
+---
+
+## 🔄 ६. भविष्यमा अपडेट गर्दा के गर्ने? (Maintenance & Updates)
+
+### क) Backend वा अपलोड अपडेट गर्दा:
+१. तयार भएको **`backend.zip`** लाई cPanel को मुख्य रूट फोल्डर (`/` वा `/home/username/`) मा अपलोड गरी **Extract** (Overwrite) गर्नुहोस्।
+२. `backend/public/uploads` फोल्डरमा अनुमति `0775` वा `0777` रहेको सुनिश्चित गर्नुहोस्।
+
+### ख) Frontend मा डिजाइन वा कोड फेरिएमा:
+१. टर्मिनलमा `node build-dist.js` चलाउने।
+२. तयार भएको नयाँ **`dist.zip`** लाई cPanel को `public_html` मा अपलोड गरी **Extract** (Overwrite) गर्ने।
+
+### ग) Database मा नयाँ कलम थपिएमा:
 ब्राउजरमा यो सुरक्षित URL खोल्ने:
 👉 **`https://api.sunstarnews.com/api/migrate-db?secret=sunstar-secure-migrate-2026`**
 - यसले पुरानो कुनै पनि समाचार वा डेटालाई **नमेटिकन** स्वतः नयाँ कलमहरू थपिदिन्छ।
 
 ---
 *अन्तिम अपडेट: २०२६-०९-११ | Sunstar News Media Pvt. Ltd.*
+

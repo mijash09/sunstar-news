@@ -8,8 +8,7 @@ import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
 import AdBanner from '@/components/molecules/AdBanner';
 import SocialShareBar from '@/components/molecules/SocialShareBar';
-import RashifalSection from '@/components/organisms/RashifalSection';
-import SUNSTAR_DATA, { Article, CommentItem, BannerAd } from '@/lib/data';
+import SUNSTAR_DATA, { Article, BannerAd } from '@/lib/data';
 import { toNepaliRelativeTime } from '@/lib/nepaliDate';
 import { useRouter } from 'next/navigation';
 
@@ -53,7 +52,6 @@ export default function SingleArticleClient({ article, relatedArticles, trending
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [likesCount, setLikesCount] = useState(article.likesCount ?? (article as any).likes_count ?? 12);
   const [userLiked, setUserLiked] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
 
   // Comments State
   const initialArticleComments: Comment[] = (
@@ -137,14 +135,6 @@ export default function SingleArticleClient({ article, relatedArticles, trending
         body: JSON.stringify({ action: 'toggle-like', articleId: article.id, increment: nextLiked }),
       });
     } catch (e) {}
-  }
-
-  function handleCopyLink() {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 3000);
-    }
   }
 
   async function handleAddComment(e: React.FormEvent) {

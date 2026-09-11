@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import SUNSTAR_DATA, { BannerAd } from '@/lib/data';
+import { BannerAd } from '@/lib/data';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 interface AdBannerProps {

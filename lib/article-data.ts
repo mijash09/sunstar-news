@@ -39,7 +39,7 @@ export async function getArticleByIdAsync(id: string): Promise<Article> {
   // 1. Single GET API call (/api/articles/{id})
   try {
     const res = await fetch(`${API_URL}/articles/${encodeURIComponent(cleanId)}`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
       headers: { Accept: 'application/json' },
     });
     if (res.ok) {

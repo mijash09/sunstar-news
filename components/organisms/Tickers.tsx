@@ -9,7 +9,6 @@ export default function Tickers({ initialBreakingNews }: { initialBreakingNews?:
   const [stocks, setStocks] = useState<any[]>(SUNSTAR_DATA.trendingStocks || []);
   const [breakingNews, setBreakingNews] = useState<string[]>(initialBreakingNews || SUNSTAR_DATA.breakingNews || []);
   const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const tickerRef = useRef<HTMLDivElement>(null);
   const [animDuration, setAnimDuration] = useState<number>(35);
@@ -38,9 +37,6 @@ export default function Tickers({ initialBreakingNews }: { initialBreakingNews?:
       })
       .catch((err) => {
         console.warn('Live NEPSE Ticker Fetch Error:', err);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
       });
 
     return () => {

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getRashifalById, getAllRashifal } from '@/lib/data';
 import SingleRashifalClient from '@/components/organisms/SingleRashifalClient';
 
