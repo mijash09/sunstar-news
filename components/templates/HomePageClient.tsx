@@ -17,7 +17,7 @@ import RightLeadGridSection from '@/components/organisms/RightLeadGridSection';
 import PradeshTabs from '@/components/organisms/PradeshTabs';
 import RashifalSection from '@/components/organisms/RashifalSection';
 import AdBanner from '@/components/molecules/AdBanner';
-import SUNSTAR_DATA, { Article } from '@/lib/data';
+import SUNSTAR_DATA from '@/lib/data';
 
 function supplementWithDummy<T>(
   realData: T[] | undefined,
@@ -54,12 +54,14 @@ async function fetchClientLandingData() {
   return res.json();
 }
 
+import LandingPageSkeleton from '@/components/organisms/LandingPageSkeleton';
+
 export default function HomePageClient() {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // React Query hook: consumes pre-hydrated SSR data seamlessly
-  const { data: rawData } = useQuery({
+  // React Query hook: consumes live API data with automatic caching
+  const { data: rawData, isLoading } = useQuery({
     queryKey: ['landing-data'],
     queryFn: fetchClientLandingData,
     staleTime: 60 * 1000,
@@ -126,20 +128,25 @@ export default function HomePageClient() {
   );
 
   return (
-    <div>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* 1. Header (Logo, Weather, Date, Search, Theme Toggle) */}
       <Header onOpenSearch={() => setIsSearchOpen(true)} banners={pageData.banners || []} />
 
       {/* 2. Primary Header Navigation Categories */}
       <Navigation activeHref="/" />
 
-      {/* 3. Stock Market & Breaking News Tickers Below Header */}
-      <Tickers />
+      {/* Loading Skeleton with Ant Design & Smooth Fade Transition */}
+      {isLoading && !rawData ? (
+        <LandingPageSkeleton />
+      ) : (
+        <div style={{ animation: 'landingContentFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+          {/* 3. Stock Market & Breaking News Tickers Below Header */}
+          <Tickers />
 
-      {/* Top Header Banner Slot */}
-      <div className="container" style={{ padding: '4px 16px' }}>
-        <AdBanner position="header-top" banners={pageData.banners || []} />
-      </div>
+          {/* Top Header Banner Slot */}
+          <div className="container" style={{ padding: '4px 16px' }}>
+            <AdBanner position="header-top" banners={pageData.banners || []} />
+          </div>
 
       <main className="main-content-layout container">
         {/* 5. Main Content Layout with 70% Left Main Content & 30% Right Sidebar */}
@@ -250,6 +257,8 @@ export default function HomePageClient() {
         {/* Footer Top Banner */}
         <AdBanner position="footer-top" banners={pageData.banners || []} />
       </main>
+      </div>
+      )}
 
       <Footer onOpenSearch={() => setIsSearchOpen(true)} />
 
@@ -258,6 +267,19 @@ export default function HomePageClient() {
         onClose={() => setIsSearchOpen(false)}
         onSelectArticle={handleSelectArticle}
       />
+
+      <style jsx global>{`
+        @keyframes landingContentFadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

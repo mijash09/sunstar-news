@@ -122,4 +122,47 @@ class Article extends Model
         }
         return $value ?: 'भर्खरै';
     }
+
+    public function getImageAttribute($value): string
+    {
+        if (empty($value) || !is_string($value)) {
+            return 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200';
+        }
+        $value = trim($value);
+        if (!\App\Services\FileUploadService::isValidImageUrl($value)) {
+            return 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1200';
+        }
+        return \App\Services\FileUploadService::normalizeUrl($value);
+    }
+
+    public function getImagesAttribute($value): array
+    {
+        $list = [];
+        if (is_array($value)) {
+            $list = $value;
+        } elseif (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                $list = $decoded;
+            } elseif (!empty($value)) {
+                $list = [$value];
+            }
+        }
+
+        $sanitized = [];
+        foreach ($list as $item) {
+            if (!empty($item) && is_string($item)) {
+                $item = trim($item);
+                if (\App\Services\FileUploadService::isValidImageUrl($item)) {
+                    $sanitized[] = \App\Services\FileUploadService::normalizeUrl($item);
+                }
+            }
+        }
+
+        if (empty($sanitized)) {
+            $sanitized[] = $this->getImageAttribute($this->attributes['image'] ?? null);
+        }
+
+        return array_values(array_unique($sanitized));
+    }
 }

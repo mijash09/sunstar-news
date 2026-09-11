@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import SectionHeader from '@/components/molecules/SectionHeader';
 import Avatar from '@/components/atoms/Avatar';
 import { Opinion } from '@/lib/data';

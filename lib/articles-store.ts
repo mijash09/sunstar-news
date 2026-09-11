@@ -1,4 +1,4 @@
-import SUNSTAR_DATA, { Article } from '@/lib/data';
+import { Article } from '@/lib/data';
 import { toNepaliRelativeTime } from '@/lib/nepaliDate';
 import fs from 'fs';
 import path from 'path';
@@ -15,7 +15,7 @@ export async function getDbArticles(): Promise<Article[]> {
   // 1. Try fetching from Laravel Backend API
   try {
     const res = await fetch(`${LARAVEL_API_BASE}/articles?limit=100`, {
-      cache: 'no-store',
+      next: { revalidate: 60 },
       headers: { 'Accept': 'application/json' },
     });
     if (res.ok) {

@@ -5,10 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './dashboard.module.css';
 import {
-  Layout,
   Menu,
   Card,
-  Statistic,
   Row,
   Col,
   Table,
@@ -17,15 +15,11 @@ import {
   Select,
   Tag,
   Modal,
-  Form,
   Upload,
-  Switch,
   Space,
   Popconfirm,
-  Badge,
   Typography,
   Divider,
-  Tooltip,
   UploadFile,
   Segmented,
 } from 'antd';
@@ -42,21 +36,15 @@ import {
   EditOutlined,
   SearchOutlined,
   UploadOutlined,
-  CheckCircleOutlined,
   ReloadOutlined,
   GlobalOutlined,
-  LinkOutlined,
-  FileMarkdownOutlined,
   CommentOutlined,
-  LikeOutlined,
 } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 
 import SUNSTAR_DATA, { BannerAd } from '@/lib/data';
 import EasyMarkdownEditor from '@/components/organisms/EasyMarkdownEditor';
 import { getApiBaseUrl } from '@/lib/api-config';
-
-const { Header, Sider, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 

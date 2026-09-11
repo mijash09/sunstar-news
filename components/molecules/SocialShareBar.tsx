@@ -56,17 +56,6 @@ export default function SocialShareBar({
     }
   };
 
-  const handleNativeShare = async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          url: shareUrl,
-        });
-        recordShare('native');
-      } catch (err) {}
-    }
-  };
 
   const downloadFilename = imageUrl ? imageUrl.split('/').pop() : '';
   const downloadLink = imageUrl && imageUrl.startsWith('/storage/uploads/')

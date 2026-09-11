@@ -7,8 +7,7 @@ import Navigation from '@/components/organisms/Navigation';
 import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
 import { useRouter } from 'next/navigation';
-import { RashifalItem, getArticleById } from '@/lib/data';
-import SUNSTAR_DATA from '@/lib/data';
+import SUNSTAR_DATA, { RashifalItem } from '@/lib/data';
 
 interface Comment {
   id: string;

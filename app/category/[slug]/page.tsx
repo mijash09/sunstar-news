@@ -105,7 +105,7 @@ export default async function CategoryPage({ params }: Props) {
   const categoryTitle = categoryTitles[params.slug] || 'समाचार वर्ग';
   const cleanTitle = categoryTitle.replace(/^[^\w\s\u0900-\u097F]+/, '').trim();
 
-  const { articles, lead, rest, allCategoryArticles } = await getCategoryArticlesAsync(params.slug);
+  const { lead, rest, allCategoryArticles } = await getCategoryArticlesAsync(params.slug);
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
