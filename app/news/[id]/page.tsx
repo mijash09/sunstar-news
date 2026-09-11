@@ -4,7 +4,12 @@ import { getAllArticles } from '@/lib/data';
 import { getArticleByIdAsync, getDummyFallbackArticle } from '@/lib/article-data';
 import { getDbBanners } from '@/lib/landing-data';
 
-export const dynamic = 'force-dynamic';
+export function generateStaticParams() {
+  const articles = getAllArticles();
+  return articles.map((article) => ({
+    id: article.id,
+  }));
+}
 
 interface Props {
   params: { id: string };

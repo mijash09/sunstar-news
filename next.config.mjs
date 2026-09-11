@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
+const isDev = process.env.NODE_ENV === 'development';
+
 const nextConfig = {
-  reactStrictMode: true,
+  ...(isDev ? {} : { output: 'export', distDir: 'dist' }),
+  trailingSlash: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -10,21 +14,21 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://127.0.0.1:8000/api/:path*',
-      },
-      {
-        source: '/storage/:path*',
-        destination: 'http://127.0.0.1:8000/storage/:path*',
-      },
-      {
-        source: '/docs/:path*',
-        destination: 'http://127.0.0.1:8000/docs/:path*',
-      },
-    ];
+    if (isDev) {
+      return [
+        {
+          source: '/api/:path*',
+          destination: 'http://127.0.0.1:8000/api/:path*',
+        },
+        {
+          source: '/storage/:path*',
+          destination: 'http://127.0.0.1:8000/storage/:path*',
+        },
+      ];
+    }
+    return [];
   },
 };
 
 export default nextConfig;
+

@@ -2,19 +2,52 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import SUNSTAR_DATA from '@/lib/data';
+import SUNSTAR_DATA, { BannerAd } from '@/lib/data';
 import WeatherWidget from '@/components/molecules/WeatherWidget';
 import LiveDateBadge from '@/components/molecules/LiveDateBadge';
 import Button from '@/components/atoms/Button';
 import Badge from '@/components/atoms/Badge';
+import { TopLevelBanner } from '@/components/molecules/AdBanner';
 
 export default function Header({
   onOpenSearch,
+  banners,
 }: {
   onOpenSearch?: () => void;
+  banners?: BannerAd[] | any[];
 }) {
   const [theme, setTheme] = useState<string>('light');
   const [mounted, setMounted] = useState(false);
+  const [fetchedBanners, setFetchedBanners] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (banners === undefined) {
+      fetch('/api/banners')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && Array.isArray(data.data)) {
+            setFetchedBanners(data.data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [banners]);
+
+  const sourceBanners: any[] = Array.isArray(banners) ? banners : fetchedBanners;
+
+  const hasTopLeaderboard = sourceBanners.some((b: any) => {
+    const p = String(b.position || '').toLowerCase().trim();
+    const active = b.isActive !== undefined ? b.isActive : b.is_active;
+    const isTrue = active === true || active === 1 || active === '1' || active === 'true';
+    return (p === 'top-leaderboard' || p === 'top-header-banner') && isTrue;
+  });
+
+  const hasHeaderAdSpace = sourceBanners.some((b: any) => {
+    const p = String(b.position || '').toLowerCase().trim();
+    const active = b.isActive !== undefined ? b.isActive : b.is_active;
+    const isTrue = active === true || active === 1 || active === '1' || active === 'true';
+    return (p === 'header-ad-space' || p === 'header-logo-side' || p === 'hero-side') && isTrue;
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -32,17 +65,18 @@ export default function Header({
 
   return (
     <>
-      {/* Top Leaderboard Banner above header */}
-      <div className="container" style={{ paddingTop: '10px' }}>
-        <Link href="/login" style={{ display: 'block', overflow: 'hidden', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg"
-            alt="Top Header Ad Banner"
-            style={{ width: '100%', maxHeight: '110px', objectFit: 'cover', display: 'block' }}
+      {/* 1. Top Leaderboard Banner above header */}
+      {hasTopLeaderboard && (
+        <div className="container" style={{ paddingTop: '10px' }}>
+          <TopLevelBanner
+            position="top-leaderboard"
+            banners={sourceBanners}
+            margin="0"
+            maxHeight="110px"
+            altText="Top Header Ad Banner"
           />
-        </Link>
-      </div>
+        </div>
+      )}
 
       <header className="top-utility-bar">
         <div className="container">
@@ -105,16 +139,18 @@ export default function Header({
             </Link>
           </div>
 
-          <div className="header-ad-space" style={{ overflow: 'hidden', padding: 0 }}>
-            <Link href="/login" style={{ display: 'block', width: '100%', height: '100%' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://assets-cdn.ekantipur.com/uploads/source/ads/desktop-3082026051412.jpg"
-                alt="Header Ad Space"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
+          {/* 2. Header Ad Space next to Logo */}
+          {hasHeaderAdSpace && (
+            <div className="header-ad-space" style={{ overflow: 'hidden', padding: 0, border: 'none', background: 'transparent' }}>
+              <TopLevelBanner
+                position="header-ad-space"
+                banners={sourceBanners}
+                margin="0"
+                maxHeight="90px"
+                altText="Header Ad Space"
               />
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </>

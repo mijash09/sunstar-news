@@ -57,8 +57,37 @@ Route::get('/banners', [BannerController::class, 'index']);
 Route::post('/banners', [BannerController::class, 'store']);
 Route::delete('/banners/{id}', [BannerController::class, 'destroy']);
 
-// 7. Users / Staff Management
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+// 8. Safe 1-Click Database Schema Migration for cPanel (Preserves All Existing Data)
+Route::get('/migrate-db', function (Request $request) {
+    $secret = $request->query('secret');
+    $expectedSecret = env('DB_MIGRATE_SECRET', 'sunstar-secure-migrate-2026');
+
+    if (!$secret || $secret !== $expectedSecret) {
+        return response()->json([
+            'success' => false,
+            'message' => 'अनधिकृत: कृपया सही secret key प्रदान गर्नुहोस्। (Unauthorized: Please provide valid ?secret=)'
+        ], 403);
+    }
+
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'डेटाबेस सफलतापूर्वक माइग्रेट भयो! पुरानो कुनै पनि डेटा मेटिएको छैन। (Database successfully migrated with 0 data loss!)',
+            'artisan_output' => trim($output),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+

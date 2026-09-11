@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:dist": "node build-dist.js",
     "start": "next start",
-    "start:cpanel": "node server.js",
     "lint": "next lint",
     "turbo:dev": "turbo dev",
     "turbo:build": "turbo build"

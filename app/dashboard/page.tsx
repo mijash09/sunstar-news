@@ -52,10 +52,9 @@ import {
 } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 
-import { logoutAction } from '@/app/actions/auth';
-import { createArticleAction, deleteArticleAction, createStaffUserAction, createBannerAction, deleteBannerAction } from '@/app/actions/dashboard';
 import SUNSTAR_DATA, { BannerAd } from '@/lib/data';
 import EasyMarkdownEditor from '@/components/organisms/EasyMarkdownEditor';
+import { getApiBaseUrl } from '@/lib/api-config';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -64,7 +63,9 @@ const { Option } = Select;
 type TabType = 'overview' | 'articles' | 'create' | 'banners' | 'users' | 'bhakharai';
 
 const BANNER_POSITIONS_INFO = [
-  // Home Page Positions
+  // Home & Global Header Page Positions
+  { keyword: 'top-leaderboard', name: 'शीर्ष लिडरबोर्ड ब्यानर (Top Leaderboard)', size: '९७० x १०० / ७२८ x ९० px', page: 'सबै पाना / शीर्ष भाग', screen: 'home', desc: 'वेबसाइटको सबैभन्दा माथिल्लो पट्टीमा देखा पर्ने मुख्य लिडरबोर्ड ब्यानर' },
+  { keyword: 'header-ad-space', name: 'हेडर विज्ञापन स्थान (Header Ad Space)', size: '७२८ x ९० px', page: 'सबै पाना / लोगो दायाँ', screen: 'home', desc: 'मुख्य हेडरमा सनस्टार न्युज लोगोको ठिक दायाँ पट्टी देखिने मुख्य ब्यानर' },
   { keyword: 'header-top', name: 'मुख्य माथिल्लो ब्यानर (Header Top)', size: '७२८ x ९० px', page: 'गृहपृष्ठ / सबै पाना', screen: 'home', desc: 'हेडर र मुख्य नेभिगेसन बारको मुनि देखा पर्ने मुख्य ब्यानर' },
   { keyword: 'home-hero-below', name: 'मुख्य समाचार मुनिको ब्यानर (Below Hero)', size: '९७० x ९० / ७२८ x ९० px', page: 'गृहपृष्ठ', screen: 'home', desc: 'गृहपृष्ठको प्रमुख लिड समाचार मुनि देखा पर्ने मुख्य ब्यानर' },
   { keyword: 'mid-content-1', name: 'राजनीति र अर्थ बीचको ब्यानर (Mid 1)', size: '७२८ x ९० px', page: 'गृहपृष्ठ', screen: 'home', desc: 'गृहपृष्ठमा राजनीति र अर्थ समाचार ब्लक बीच देखा पर्ने ब्यानर' },
@@ -215,7 +216,7 @@ function DashboardContent() {
     setIsSavingLikes(true);
     const toastId = toast.loading('लाइक्स सुरक्षित गर्दैछ...');
     try {
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -261,7 +262,7 @@ function DashboardContent() {
   async function handleDeleteComment(articleId: string, commentId: string) {
     const toastId = toast.loading('प्रतिक्रिया हटाइँदैछ...');
     try {
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'delete-comment', articleId, commentId }),
@@ -295,7 +296,7 @@ function DashboardContent() {
     if (!newAdminCommentText.trim() || !selectedArticleForComments) return;
     const toastId = toast.loading('प्रतिक्रिया राखिँदैछ...');
     try {
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -319,11 +320,17 @@ function DashboardContent() {
     }
   }
 
+  function handleLogout() {
+    localStorage.removeItem('sunstar_user');
+    document.cookie = 'sunstar_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    window.location.href = '/login';
+  }
+
   // Fetch API Dashboard Data
   async function fetchDashboardData(showSuccessToast: boolean = false) {
     setIsFetchingDashboard(true);
     try {
-      const res = await fetch(`/api/dashboard?t=${Date.now()}`, {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard?t=${Date.now()}`, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache' },
       });
@@ -360,7 +367,7 @@ function DashboardContent() {
     setLoading(true);
     try {
       const lines = breakingNewsText.split('\n').filter((l) => l.trim().length > 0);
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'update-breaking-news', breakingNews: lines, items: lines }),
@@ -427,7 +434,7 @@ function DashboardContent() {
         }
       });
 
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         body: formData,
       });
@@ -460,7 +467,7 @@ function DashboardContent() {
   async function handleDeleteArticle(id: string) {
     const toastId = toast.loading('समाचार हटाइँदैछ...');
     try {
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'delete-article', id }),
@@ -564,7 +571,7 @@ function DashboardContent() {
         }
       });
 
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         body: formData,
       });
@@ -601,7 +608,7 @@ function DashboardContent() {
         }
       });
 
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         body: formData,
       });
@@ -639,7 +646,7 @@ function DashboardContent() {
         }
       });
 
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         body: formData,
       });
@@ -664,7 +671,7 @@ function DashboardContent() {
   async function handleDeleteBanner(id: string) {
     const toastId = toast.loading('ब्यानर हटाइँदैछ...');
     try {
-      const res = await fetch('/api/dashboard', {
+      const res = await fetch(`${getApiBaseUrl()}/dashboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'delete-banner', id }),
@@ -867,12 +874,10 @@ function DashboardContent() {
           </div>
 
           <div className={styles.logoutWrap}>
-            <form action={logoutAction}>
-              <button type="submit" className={styles.logoutBtn}>
-                <LogoutOutlined />
-                {!collapsed && <span>लगआउट</span>}
-              </button>
-            </form>
+            <button type="button" onClick={handleLogout} className={styles.logoutBtn}>
+              <LogoutOutlined />
+              {!collapsed && <span>लगआउट</span>}
+            </button>
           </div>
         </div>
       )}
@@ -906,11 +911,9 @@ function DashboardContent() {
           />
         </div>
         <div className={styles.logoutWrap}>
-          <form action={logoutAction}>
-            <button type="submit" className={styles.logoutBtn}>
-              <LogoutOutlined /> <span>लगआउट</span>
-            </button>
-          </form>
+          <button type="button" onClick={handleLogout} className={styles.logoutBtn}>
+            <LogoutOutlined /> <span>लगआउट</span>
+          </button>
         </div>
       </div>
 

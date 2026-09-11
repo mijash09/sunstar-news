@@ -17,10 +17,37 @@ import RightLeadGridSection from '@/components/organisms/RightLeadGridSection';
 import PradeshTabs from '@/components/organisms/PradeshTabs';
 import RashifalSection from '@/components/organisms/RashifalSection';
 import AdBanner from '@/components/molecules/AdBanner';
-import SUNSTAR_DATA from '@/lib/data';
+import SUNSTAR_DATA, { Article } from '@/lib/data';
+
+function supplementWithDummy<T>(
+  realData: T[] | undefined,
+  dummyData: T[],
+  requiredCount: number,
+  getId: (item: T) => string = (item: any) => item.id || String(item)
+): T[] {
+  const list = Array.isArray(realData) ? [...realData] : [];
+  if (list.length >= requiredCount) {
+    return list;
+  }
+
+  const existingIds = new Set(list.map(getId));
+  for (const item of (dummyData || [])) {
+    if (list.length >= requiredCount) break;
+    const id = getId(item);
+    if (!existingIds.has(id)) {
+      list.push(item);
+      existingIds.add(id);
+    }
+  }
+
+  return list;
+}
+
+import { getApiBaseUrl } from '@/lib/api-config';
 
 async function fetchClientLandingData() {
-  const res = await fetch('/api/landing-data');
+  const apiBase = getApiBaseUrl();
+  const res = await fetch(`${apiBase}/landing-data`);
   if (!res.ok) {
     throw new Error('Failed to fetch landing data');
   }
@@ -32,11 +59,42 @@ export default function HomePageClient() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // React Query hook: consumes pre-hydrated SSR data seamlessly
-  const { data: pageData = SUNSTAR_DATA } = useQuery({
+  const { data: rawData } = useQuery({
     queryKey: ['landing-data'],
     queryFn: fetchClientLandingData,
     staleTime: 60 * 1000,
   });
+
+  // Seamlessly merge API data with rich fallback data so sections never appear empty
+  const pageData = React.useMemo(() => {
+    const src = rawData || {};
+    return {
+      ...SUNSTAR_DATA,
+      ...src,
+      featuredLead: src.featuredLead || SUNSTAR_DATA.featuredLead,
+      topSecondaryLeads: supplementWithDummy(src.topSecondaryLeads, SUNSTAR_DATA.topSecondaryLeads, 4),
+      timelineFeed: supplementWithDummy(
+        src.timelineFeed || src.latestTimeline || src.tajaSamachar,
+        SUNSTAR_DATA.latestTimeline,
+        6
+      ),
+      exclusiveNews: supplementWithDummy(src.exclusiveNews, SUNSTAR_DATA.exclusiveNews, 5),
+      politicsNews: supplementWithDummy(src.politicsNews, SUNSTAR_DATA.politicsNews, 4),
+      businessNews: supplementWithDummy(src.businessNews, SUNSTAR_DATA.businessNews, 5),
+      sportsNews: supplementWithDummy(src.sportsNews, SUNSTAR_DATA.sportsNews, 5),
+      entertainmentNews: supplementWithDummy(src.entertainmentNews, SUNSTAR_DATA.entertainmentNews, 5),
+      featureNews: supplementWithDummy(src.featureNews, SUNSTAR_DATA.featureNews, 5),
+      technologyNews: supplementWithDummy(src.technologyNews, SUNSTAR_DATA.technologyNews, 5),
+      worldNews: supplementWithDummy(src.worldNews, SUNSTAR_DATA.worldNews, 5),
+      opinions: supplementWithDummy(src.opinions, SUNSTAR_DATA.opinions, 4),
+      breakingNews:
+        Array.isArray(src.breakingNews) && src.breakingNews.length > 0
+          ? src.breakingNews
+          : SUNSTAR_DATA.breakingNews,
+      // Banners: strictly real database banners, NEVER dummy data per user specification!
+      banners: Array.isArray(src.banners) ? src.banners : [],
+    };
+  }, [rawData]);
 
   const handleSelectArticle = (id: string) => {
     router.push(`/news/${id}`);
@@ -70,7 +128,7 @@ export default function HomePageClient() {
   return (
     <div>
       {/* 1. Header (Logo, Weather, Date, Search, Theme Toggle) */}
-      <Header onOpenSearch={() => setIsSearchOpen(true)} />
+      <Header onOpenSearch={() => setIsSearchOpen(true)} banners={pageData.banners || []} />
 
       {/* 2. Primary Header Navigation Categories */}
       <Navigation activeHref="/" />

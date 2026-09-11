@@ -196,7 +196,7 @@ export default function SingleArticleClient({ article, relatedArticles, trending
 
   return (
     <div className="single-article-view-shell" style={{ backgroundColor: 'var(--bg-main)', minHeight: '100vh' }}>
-      <Header onOpenSearch={() => setIsSearchOpen(true)} />
+      <Header onOpenSearch={() => setIsSearchOpen(true)} banners={liveBanners} />
       <Navigation />
 
       <main className="container" style={{ paddingTop: '24px', paddingBottom: '60px' }}>
