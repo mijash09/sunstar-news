@@ -1,7 +1,9 @@
-import { sql } from '@/lib/db';
 import SUNSTAR_DATA, { Article } from '@/lib/data';
+import { toNepaliRelativeTime } from '@/lib/nepaliDate';
 import fs from 'fs';
 import path from 'path';
+
+const LARAVEL_API_BASE = process.env.LARAVEL_API_BASE || 'http://127.0.0.1:8000/api';
 
 function getArticlesCacheFilePath() {
   return path.join(process.cwd(), 'articles-cache.json');
@@ -10,81 +12,63 @@ function getArticlesCacheFilePath() {
 let inMemoryArticles: Article[] | null = null;
 
 export async function getDbArticles(): Promise<Article[]> {
-  let dbRows: any[] = [];
+  // 1. Try fetching from Laravel Backend API
   try {
-    dbRows = await sql`
-      SELECT id, title, category, summary, content, image, images, interactions_json, comments_json, likes_count, author, source, published, created_at
-      FROM db_articles
-      ORDER BY created_at DESC
-    `;
-  } catch (err) {
-    try {
-      dbRows = await sql`
-        SELECT id, title, category, summary, content, image, images, author, source, published, created_at
-        FROM db_articles
-        ORDER BY created_at DESC
-      `;
-    } catch (e2) {
-      dbRows = [];
+    const res = await fetch(`${LARAVEL_API_BASE}/articles?limit=100`, {
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' },
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && Array.isArray(json.data) && json.data.length > 0) {
+        const formatted: Article[] = json.data.map((art: any) => {
+          const relativeTime = (art.updated_at || art.created_at)
+            ? toNepaliRelativeTime(art.updated_at || art.created_at)
+            : (art.time || 'भर्खरै');
+
+          return {
+            id: String(art.id),
+            title: art.title || '',
+            slug: art.slug,
+            category: art.category || 'मुख्य समाचार',
+            categories: Array.isArray(art.categories) ? art.categories : [art.category || 'मुख्य समाचार'],
+            summary: art.summary || '',
+            content: art.content || art.summary || art.title,
+            image: art.image || '/assets/sunstar-logo.jpg',
+            images: Array.isArray(art.images) && art.images.length > 0 ? art.images : [art.image || '/assets/sunstar-logo.jpg'],
+            likesCount: typeof art.likes_count === 'number' ? art.likes_count : 12,
+            sharesCount: typeof art.shares_count === 'number' ? art.shares_count : 0,
+            commentsCount: typeof art.comments_count === 'number' ? art.comments_count : (Array.isArray(art.comments_list) ? art.comments_list.length : 0),
+            commentsList: Array.isArray(art.comments_list) ? art.comments_list : [],
+            author: art.author || 'सनस्टार संवाददाता',
+            author_role: art.author_role,
+            authorRole: art.author_role || art.authorRole,
+            author_image: art.author_image,
+            authorImage: art.author_image || art.authorImage,
+            read_time: art.read_time,
+            readTime: art.read_time || art.readTime,
+            province: art.province || null,
+            tags: art.tags || [],
+            source: art.source || 'SunstarNews.com',
+            time: relativeTime,
+            updated_at: art.updated_at,
+            created_at: art.created_at,
+            views: art.views || '१.२ के',
+          };
+        });
+        inMemoryArticles = formatted;
+        return formatted;
+      }
     }
+  } catch (err: any) {
+    // Backend offline or during build phase
   }
 
-  const formattedDb: Article[] = (dbRows || []).map((row: any) => {
-    let imagesArr: string[] = [];
-    if (Array.isArray(row.images)) {
-      imagesArr = row.images;
-    } else if (typeof row.images === 'string' && row.images.trim().startsWith('[')) {
-      try {
-        imagesArr = JSON.parse(row.images);
-      } catch (e) {
-        imagesArr = [row.image || '/assets/sunstar-logo.jpg'];
-      }
-    } else {
-      imagesArr = [row.image || '/assets/sunstar-logo.jpg'];
-    }
+  // 2. Fallback to local memory or cache file
+  if (inMemoryArticles && inMemoryArticles.length > 0) {
+    return inMemoryArticles;
+  }
 
-    let interactions: any = {};
-    if (typeof row.interactions_json === 'string' && row.interactions_json.trim().startsWith('{')) {
-      try {
-        interactions = JSON.parse(row.interactions_json);
-      } catch (e) {}
-    }
-
-    let commentsList: any[] = [];
-    if (Array.isArray(interactions.comments)) {
-      commentsList = interactions.comments;
-    } else if (Array.isArray(row.comments_json)) {
-      commentsList = row.comments_json;
-    } else if (typeof row.comments_json === 'string' && row.comments_json.trim().startsWith('[')) {
-      try {
-        commentsList = JSON.parse(row.comments_json);
-      } catch (e) {}
-    }
-
-    const likesCount = typeof interactions.likes === 'number'
-      ? interactions.likes
-      : (typeof row.likes_count === 'number' && !isNaN(row.likes_count) ? Number(row.likes_count) : 12);
-
-    return {
-      id: String(row.id),
-      title: row.title || '',
-      category: row.category || 'मुख्य समाचार',
-      categories: [row.category || 'मुख्य समाचार', 'ताजा खबर'],
-      summary: row.summary || '',
-      content: row.content || '',
-      image: row.image || (imagesArr[0] || '/assets/sunstar-logo.jpg'),
-      images: imagesArr,
-      likesCount,
-      commentsCount: commentsList.length,
-      commentsList,
-      author: row.author || 'सनस्टार संवाददाता',
-      source: row.source || 'सनस्टार न्युज',
-      time: 'भर्खरै',
-      views: interactions.views || '१.२ के',
-    };
-  });
-
-  // Read local file fallback articles
   let localFileArticles: Article[] = [];
   try {
     const file = getArticlesCacheFilePath();
@@ -97,77 +81,33 @@ export async function getDbArticles(): Promise<Article[]> {
     }
   } catch (e) {}
 
-  // Merge DB articles and local file cached articles without duplicates (preserving newest order at top)
-  const existingIds = new Set(formattedDb.map((a) => a.id));
-  const newFromLocal: Article[] = [];
-  for (const localArt of localFileArticles) {
-    if (!existingIds.has(localArt.id)) {
-      newFromLocal.push(localArt);
-      existingIds.add(localArt.id);
-    }
-  }
-
-  const combined = [...newFromLocal, ...formattedDb];
-  inMemoryArticles = combined;
-  return combined;
+  return localFileArticles;
 }
 
 export async function saveDbArticle(article: Article): Promise<boolean> {
-  if (!inMemoryArticles) {
-    inMemoryArticles = [];
-  }
-  const filtered = inMemoryArticles.filter((a) => a.id !== article.id);
-  filtered.unshift(article);
-  inMemoryArticles = filtered;
+  // Update in-memory
+  if (!inMemoryArticles) inMemoryArticles = [];
+  inMemoryArticles = inMemoryArticles.filter((a) => a.id !== article.id);
+  inMemoryArticles.unshift(article);
 
-  const imagesJson = JSON.stringify(article.images && article.images.length > 0 ? article.images.slice(0, 10) : [article.image || '/assets/sunstar-logo.jpg']);
-  const commentsList = article.commentsList || [];
-  const likesCount = typeof article.likesCount === 'number' ? article.likesCount : 12;
-  const commentsJson = JSON.stringify(commentsList);
-  
-  const interactionsObj = {
-    likes: likesCount,
-    comments: commentsList,
-    views: article.views || '१.२ के',
-  };
-  const interactionsJson = JSON.stringify(interactionsObj);
-
-  // 1. Save to DB safely
+  // 1. Post to Laravel Backend API
   try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS db_articles (
-        id VARCHAR(100) PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        category VARCHAR(100) NOT NULL,
-        summary TEXT,
-        content LONGTEXT,
-        image VARCHAR(500),
-        images TEXT,
-        interactions_json LONGTEXT,
-        comments_json LONGTEXT,
-        likes_count INT DEFAULT 0,
-        author VARCHAR(100),
-        source VARCHAR(100),
-        published BOOLEAN DEFAULT TRUE,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `;
+    await fetch(`${LARAVEL_API_BASE}/dashboard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'create-article',
+        title: article.title,
+        category: article.category,
+        summary: article.summary,
+        content: article.content,
+        imageUrl: article.image,
+        author: article.author,
+      }),
+    });
+  } catch (e) {}
 
-    try { await sql`ALTER TABLE db_articles ADD COLUMN images TEXT`; } catch (e) {}
-    try { await sql`ALTER TABLE db_articles ADD COLUMN interactions_json LONGTEXT`; } catch (e) {}
-    try { await sql`ALTER TABLE db_articles ADD COLUMN comments_json LONGTEXT`; } catch (e) {}
-    try { await sql`ALTER TABLE db_articles ADD COLUMN likes_count INT DEFAULT 0`; } catch (e) {}
-
-    await sql`
-      INSERT INTO db_articles (id, title, category, summary, content, image, images, interactions_json, comments_json, likes_count, author, source, published)
-      VALUES (${article.id}, ${article.title}, ${article.category}, ${article.summary || ''}, ${article.content || ''}, ${article.image || ''}, ${imagesJson}, ${interactionsJson}, ${commentsJson}, ${likesCount}, ${article.author || 'सनस्टार संवाददाता'}, ${article.source || 'SunstarNews.com'}, TRUE)
-      ON DUPLICATE KEY UPDATE title=${article.title}, category=${article.category}, summary=${article.summary}, content=${article.content}, image=${article.image}, images=${imagesJson}, interactions_json=${interactionsJson}, comments_json=${commentsJson}, likes_count=${likesCount}
-    `;
-  } catch (dbErr) {
-    console.warn('DB Save Article Warning:', (dbErr as any)?.message || dbErr);
-  }
-
-  // 2. Save to persistent file fallback
+  // 2. Persist to local cache file
   try {
     const file = getArticlesCacheFilePath();
     let currentList: Article[] = [];
@@ -179,9 +119,7 @@ export async function saveDbArticle(article: Article): Promise<boolean> {
     const filteredList = currentList.filter((a) => a.id !== article.id);
     filteredList.unshift(article);
     fs.writeFileSync(file, JSON.stringify(filteredList, null, 2), 'utf-8');
-  } catch (fileErr) {
-    console.warn('File Save Article Warning:', (fileErr as any)?.message || fileErr);
-  }
+  } catch (fileErr) {}
 
   return true;
 }
@@ -191,12 +129,16 @@ export async function deleteDbArticle(articleId: string): Promise<boolean> {
     inMemoryArticles = inMemoryArticles.filter((a) => a.id !== articleId);
   }
 
-  // 1. Delete from DB
+  // 1. Delete on Laravel Backend
   try {
-    await sql`DELETE FROM db_articles WHERE id = ${articleId}`;
+    await fetch(`${LARAVEL_API_BASE}/dashboard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete-article', id: articleId }),
+    });
   } catch (e) {}
 
-  // 2. Delete from local file
+  // 2. Delete in local cache file
   try {
     const file = getArticlesCacheFilePath();
     if (fs.existsSync(file)) {

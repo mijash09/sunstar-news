@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/organisms/Header';
 import Navigation from '@/components/organisms/Navigation';
@@ -9,7 +9,8 @@ import SearchModal from '@/components/organisms/SearchModal';
 import AdBanner from '@/components/molecules/AdBanner';
 import SocialShareBar from '@/components/molecules/SocialShareBar';
 import RashifalSection from '@/components/organisms/RashifalSection';
-import SUNSTAR_DATA, { Article, CommentItem } from '@/lib/data';
+import SUNSTAR_DATA, { Article, CommentItem, BannerAd } from '@/lib/data';
+import { toNepaliRelativeTime } from '@/lib/nepaliDate';
 import { useRouter } from 'next/navigation';
 
 interface Comment {
@@ -25,6 +26,7 @@ interface Props {
   article: Article;
   relatedArticles: Article[];
   trendingArticles: Article[];
+  banners?: BannerAd[] | any[];
 }
 
 const INITIAL_COMMENTS: Comment[] = [
@@ -46,25 +48,26 @@ const INITIAL_COMMENTS: Comment[] = [
   },
 ];
 
-export default function SingleArticleClient({ article, relatedArticles, trendingArticles }: Props) {
+export default function SingleArticleClient({ article, relatedArticles, trendingArticles, banners }: Props) {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [likesCount, setLikesCount] = useState(article.likesCount ?? 48);
+  const [likesCount, setLikesCount] = useState(article.likesCount ?? (article as any).likes_count ?? 12);
   const [userLiked, setUserLiked] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
   // Comments State
-  const initialArticleComments: Comment[] = Array.isArray(article.commentsList) && article.commentsList.length > 0
-    ? article.commentsList
-    : INITIAL_COMMENTS;
+  const initialArticleComments: Comment[] = (
+    Array.isArray(article.commentsList) && article.commentsList.length > 0
+      ? article.commentsList
+      : (Array.isArray((article as any).comments_list) && (article as any).comments_list.length > 0
+          ? (article as any).comments_list
+          : INITIAL_COMMENTS)
+  );
   const [comments, setComments] = useState<Comment[]>(initialArticleComments);
   const [authorName, setAuthorName] = useState('');
   const [commentText, setCommentText] = useState('');
   const [commentNotice, setCommentNotice] = useState<string | null>(null);
 
-  // Poll state
-  const [pollVoted, setPollVoted] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   // Multi Image Gallery State
   const displayImages: string[] = Array.isArray(article.images) && article.images.length > 0
@@ -72,10 +75,61 @@ export default function SingleArticleClient({ article, relatedArticles, trending
     : (article.image ? [article.image] : []);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
+  // Live single GET API refetch on mount and on window focus
+  useEffect(() => {
+    let active = true;
+
+    async function fetchLatestArticle() {
+      try {
+        const res = await fetch(`/api/articles/${article.id}`);
+        if (res.ok) {
+          const json = await res.json();
+          if (active && json && json.success && json.data) {
+            const d = json.data;
+            if (d.likesCount !== undefined || d.likes_count !== undefined) {
+              setLikesCount(d.likesCount ?? d.likes_count);
+            }
+            const incomingComments = d.commentsList ?? d.comments_list;
+            if (Array.isArray(incomingComments) && incomingComments.length > 0) {
+              setComments(incomingComments);
+            }
+          }
+        }
+      } catch (err) {
+        // quiet
+      }
+    }
+
+    fetchLatestArticle();
+
+    const handleWindowFocus = () => {
+      fetchLatestArticle();
+    };
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      active = false;
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [article.id]);
+
+  const [liveBanners, setLiveBanners] = useState<any[]>(banners || []);
+
+  useEffect(() => {
+    fetch('/api/banners')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.data && Array.isArray(data.data)) {
+          setLiveBanners(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   async function handleLikeToggle() {
     const nextLiked = !userLiked;
     setUserLiked(nextLiked);
-    setLikesCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+    setLikesCount((prev: number) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
     try {
       await fetch('/api/dashboard', {
         method: 'POST',
@@ -127,6 +181,16 @@ export default function SingleArticleClient({ article, relatedArticles, trending
           text: textToSend,
         }),
       });
+
+      // Sync latest comments from single GET API
+      const refetchRes = await fetch(`/api/articles/${article.id}`);
+      if (refetchRes.ok) {
+        const json = await refetchRes.json();
+        const incomingComments = json?.data?.commentsList ?? json?.data?.comments_list;
+        if (Array.isArray(incomingComments)) {
+          setComments(incomingComments);
+        }
+      }
     } catch (e) {}
   }
 
@@ -177,6 +241,9 @@ export default function SingleArticleClient({ article, relatedArticles, trending
               </span>
             </div>
 
+            {/* News Top Ad Banner */}
+            <AdBanner position="news-top" banners={liveBanners} margin="0 0 16px 0" />
+
             {/* Main Headline */}
             <h1
               style={{
@@ -222,7 +289,7 @@ export default function SingleArticleClient({ article, relatedArticles, trending
               </div>
 
               <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                🗓️ {article.time || article.date || 'आज भाद्र १५, २०८३'} &nbsp;|&nbsp; 👁️ {article.views || '१२०'} पठन
+                🗓️ {(article.updated_at || article.created_at) ? toNepaliRelativeTime((article.updated_at || article.created_at)!) : (article.time || article.date || 'भर्खरै')} &nbsp;|&nbsp; 👁️ {article.views || '१२०'} पठन
               </div>
             </div>
 
@@ -230,6 +297,8 @@ export default function SingleArticleClient({ article, relatedArticles, trending
             <SocialShareBar
               title={article.title}
               url={`https://sunstarnews.com/news/${article.id}`}
+              articleId={article.id}
+              imageUrl={displayImages[0] || article.image}
             />
 
             {/* Sliding Cover Image Carousel */}
@@ -401,6 +470,55 @@ export default function SingleArticleClient({ article, relatedArticles, trending
               </div>
             )}
 
+            {/* Ad Banner: Under Photo */}
+            <AdBanner position="news-under-image" banners={liveBanners} margin="20px 0" />
+
+            {/* Lead Summary Callout */}
+            {article.summary && (
+              <div
+                style={{
+                  fontSize: '1.15rem',
+                  fontWeight: 600,
+                  lineHeight: 1.75,
+                  color: 'var(--text-primary)',
+                  borderLeft: '4px solid var(--brand-orange)',
+                  paddingLeft: '16px',
+                  margin: '24px 0',
+                  fontStyle: 'italic',
+                  backgroundColor: 'rgba(249, 115, 22, 0.05)',
+                  padding: '14px 18px',
+                  borderRadius: '0 8px 8px 0',
+                }}
+              >
+                {article.summary}
+              </div>
+            )}
+
+            {/* Article Main Text Content */}
+            <div
+              style={{
+                fontSize: '1.12rem',
+                lineHeight: 1.9,
+                color: 'var(--text-secondary)',
+                margin: '28px 0 32px 0',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '18px',
+              }}
+            >
+              {(article.content || article.summary || article.title)
+                .split('\n\n')
+                .filter((p) => p.trim().length > 0)
+                .map((para, idx) => (
+                  <p key={idx} style={{ margin: 0 }}>
+                    {para}
+                  </p>
+                ))}
+            </div>
+
+            {/* Ad Banner: In-Content */}
+            <AdBanner position="news-in-content" banners={liveBanners} margin="24px 0" />
+
             {/* Like & Reaction Bar */}
             <div
               style={{
@@ -486,6 +604,9 @@ export default function SingleArticleClient({ article, relatedArticles, trending
               </div>
             </div>
 
+            {/* Ad Banner: News Bottom */}
+            <AdBanner position="news-bottom" banners={liveBanners} margin="28px 0" />
+
             {/* RELATED ARTICLES GRID */}
             {relatedArticles.length > 0 && (
               <div>
@@ -516,13 +637,20 @@ export default function SingleArticleClient({ article, relatedArticles, trending
 
           {/* RIGHT SIDEBAR COLUMN (30% Width / Sticky) */}
           <aside style={{ display: 'flex', flexDirection: 'column', gap: '28px', position: 'sticky', top: '80px' }}>
-            {/* Widget 1: Sticky Ad Banner */}
-            <div className="shadcn-card" style={{ padding: '16px', textAlign: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, display: 'block', marginBottom: '8px' }}>
-                विज्ञापन (Advertisement)
-              </span>
-              <AdBanner position="sidebar-widget" margin="0" maxHeight="250px" />
-            </div>
+            {/* Widget 1: Sticky Ad Banner (Completely hidden if no advertisement added) */}
+            {liveBanners.some((b) => (b.position === 'single-news-sidebar' || b.position === 'sidebar-widget') && (b.isActive === true || b.is_active === true || b.isActive === 1 || b.is_active === 1)) && (
+              <div className="shadcn-card" style={{ padding: '16px', textAlign: 'center' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, display: 'block', marginBottom: '8px' }}>
+                  विज्ञापन (Advertisement)
+                </span>
+                <AdBanner
+                  position={liveBanners.some((b) => b.position === 'single-news-sidebar') ? 'single-news-sidebar' : 'sidebar-widget'}
+                  banners={liveBanners}
+                  margin="0"
+                  maxHeight="250px"
+                />
+              </div>
+            )}
 
             {/* Widget 2: Trending Hot News List */}
             <div className="shadcn-card" style={{ padding: '20px' }}>
@@ -572,35 +700,7 @@ export default function SingleArticleClient({ article, relatedArticles, trending
               </div>
             </div>
 
-            {/* Widget 4: Public Opinion Poll */}
-            <div className="shadcn-card" style={{ padding: '20px' }}>
-              <span className="shadcn-badge shadcn-badge-orange" style={{ marginBottom: '8px' }}>🗳️ जनमत संग्रह (Poll)</span>
-              <h4 style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.45, marginBottom: '14px' }}>
-                {SUNSTAR_DATA.poll.question}
-              </h4>
 
-              {pollVoted ? (
-                <div style={{ fontSize: '0.85rem', color: 'var(--brand-blue)', fontWeight: 800, padding: '10px', backgroundColor: 'var(--bg-alt)', borderRadius: '6px', textAlign: 'center' }}>
-                  ✅ धन्यवाद! तपाईंको मत दर्ता भयो। (कुल मत: २,८९०)
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {SUNSTAR_DATA.poll.options.map((opt) => (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setSelectedOption(opt.id);
-                        setPollVoted(true);
-                      }}
-                      className="shadcn-btn shadcn-btn-outline"
-                      style={{ width: '100%', justifyContent: 'flex-start', fontSize: '0.82rem', textAlign: 'left' }}
-                    >
-                      ⚪ {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </aside>
         </div>
       </main>

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import SingleArticleClient from '@/components/organisms/SingleArticleClient';
 import { getAllArticles } from '@/lib/data';
 import { getArticleByIdAsync, getDummyFallbackArticle } from '@/lib/article-data';
+import { getDbBanners } from '@/lib/landing-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,6 +103,8 @@ export default async function ArticleDetailPage({ params }: Props) {
     inLanguage: 'ne-NP',
   };
 
+  const banners = await getDbBanners();
+
   return (
     <div style={{ backgroundColor: 'var(--bg-main)', minHeight: '100vh' }}>
       <script
@@ -112,6 +115,7 @@ export default async function ArticleDetailPage({ params }: Props) {
         article={article}
         relatedArticles={relatedArticles}
         trendingArticles={trendingArticles}
+        banners={banners}
       />
     </div>
   );

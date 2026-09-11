@@ -10,19 +10,40 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function executeLogin(u: string, p: string) {
     setError(null);
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const res = await loginAction(null, formData);
+    try {
+      const formData = new FormData();
+      formData.set('username', u);
+      formData.set('password', p);
 
-    if (res && res.error) {
-      setError(res.error);
-      setLoading(false);
+      const res = await loginAction(null, formData);
+
+      if (res && res.error) {
+        setError(res.error);
+        setLoading(false);
+      } else {
+        // Direct successful client navigation
+        window.location.href = '/dashboard';
+      }
+    } catch (err: any) {
+      console.warn('Login redirection:', err);
+      window.location.href = '/dashboard';
     }
   }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    await executeLogin(username, password);
+  }
+
+  const handleAutoFillAndLogin = () => {
+    setUsername('Sitaram');
+    setPassword('Sitaram@123');
+    executeLogin('Sitaram', 'Sitaram@123');
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-main)', padding: '20px' }}>
@@ -54,7 +75,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label htmlFor="username" className="shadcn-label">
+              <label htmlFor="username" className="shadcn-label" style={{ color: '#000000', fontWeight: 600 }}>
                 प्रयोगकर्ता नाम वा इमेल (Username / Email)
               </label>
               <input
@@ -66,11 +87,12 @@ export default function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username or email"
                 className="shadcn-input"
+                style={{ color: '#000000' }}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="shadcn-label">
+              <label htmlFor="password" className="shadcn-label" style={{ color: '#000000', fontWeight: 600 }}>
                 पासवर्ड (Password)
               </label>
               <input
@@ -82,6 +104,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 className="shadcn-input"
+                style={{ color: '#000000' }}
               />
             </div>
 
@@ -102,10 +125,8 @@ export default function LoginPage() {
             type="button"
             className="shadcn-btn shadcn-btn-outline"
             style={{ width: '100%', fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-blue)' }}
-            onClick={() => {
-              setUsername('Sitaram');
-              setPassword('Sitaram@123');
-            }}
+            onClick={handleAutoFillAndLogin}
+            disabled={loading}
           >
             ⚡ Sitaram खाता स्वतः भर्नुहोस् (Auto-fill Sitaram)
           </button>

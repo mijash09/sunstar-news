@@ -29,10 +29,23 @@ export interface Article {
   summary?: string;
   content?: string;
   views?: string;
+  viewsCount?: number;
   likesCount?: number;
+  sharesCount?: number;
   commentsCount?: number;
   commentsList?: CommentItem[];
   location?: string;
+  isPublished?: boolean;
+  isFeatured?: boolean;
+  isExclusive?: boolean;
+  province?: string | null;
+  tags?: string[];
+  updated_at?: string;
+  created_at?: string;
+  author_role?: string;
+  author_image?: string;
+  read_time?: string;
+  readTime?: string;
 }
 
 export interface StockItem {
@@ -197,62 +210,7 @@ export const SUNSTAR_DATA = {
     aqi: "५२ (मध्यम)",
   },
 
-  banners: [
-    {
-      id: 'banner-header-1',
-      title: 'Header Main Leaderboard Ad Banner (728x90)',
-      imageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&auto=format&fit=crop&q=80',
-      targetUrl: 'https://sunstarnews.com',
-      position: 'header-top',
-      isActive: true,
-      clicksCount: 1420,
-    },
-    {
-      id: 'banner-hero-side-1',
-      title: 'Hero Right Sidebar Banner (300x250)',
-      imageUrl: 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=600&auto=format&fit=crop&q=80',
-      targetUrl: 'https://sunstarnews.com',
-      position: 'hero-side',
-      isActive: true,
-      clicksCount: 890,
-    },
-    {
-      id: 'banner-mid-1',
-      title: 'Mid Content Banner 1 (Exclusive/Lead After)',
-      imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&auto=format&fit=crop&q=80',
-      targetUrl: 'https://sunstarnews.com',
-      position: 'mid-content-1',
-      isActive: true,
-      clicksCount: 654,
-    },
-    {
-      id: 'banner-mid-2',
-      title: 'Mid Content Banner 2 (Pradesh After)',
-      imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=1200&auto=format&fit=crop&q=80',
-      targetUrl: 'https://sunstarnews.com',
-      position: 'mid-content-2',
-      isActive: true,
-      clicksCount: 432,
-    },
-    {
-      id: 'banner-sidebar-1',
-      title: 'Right Sidebar Sticky Square Banner (300x250)',
-      imageUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&auto=format&fit=crop&q=80',
-      targetUrl: 'https://sunstarnews.com',
-      position: 'sidebar-widget',
-      isActive: true,
-      clicksCount: 310,
-    },
-    {
-      id: 'banner-footer-1',
-      title: 'Footer Top Leaderboard Banner',
-      imageUrl: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1200&auto=format&fit=crop&q=80',
-      targetUrl: 'https://sunstarnews.com',
-      position: 'footer-top',
-      isActive: true,
-      clicksCount: 205,
-    },
-  ] as BannerAd[],
+  banners: [] as BannerAd[],
 
   rashifalDate: getTodayNepaliDate().rashifalTitleDate,
   rashifal: [

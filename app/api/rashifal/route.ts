@@ -214,6 +214,7 @@ export async function GET(request: NextRequest) {
       fullDate: todayInfo.formattedFullDate,
       timestamp: new Date().toISOString(),
       predictions: mergedRashifal,
+      data: mergedRashifal,
     });
   } catch (err: any) {
     console.warn('Hamro Patro API fallback to local dataset:', err.message);
@@ -226,6 +227,7 @@ export async function GET(request: NextRequest) {
       formattedBsDate: todayInfo.formattedBsDate,
       fullDate: todayInfo.formattedFullDate,
       predictions: getPeriodFallbackPredictions(type),
+      data: getPeriodFallbackPredictions(type),
       error: err.message,
     });
   }

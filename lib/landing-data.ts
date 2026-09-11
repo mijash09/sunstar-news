@@ -1,5 +1,5 @@
-import { sql } from '@/lib/db';
-import SUNSTAR_DATA, { Article, Opinion, StoryItem, BannerAd } from '@/lib/data';
+const API_URL = "http://127.0.0.1:8000/api";
+import SUNSTAR_DATA, { Article, Opinion, StoryItem, BannerAd, getAllArticles } from '@/lib/data';
 import { getBreakingNews } from '@/lib/settings-store';
 import { getDbArticles } from '@/lib/articles-store';
 
@@ -30,16 +30,49 @@ export function supplementWithDummy<T>(
   return list;
 }
 
+export async function getDbBanners(): Promise<BannerAd[]> {
+  try {
+    const res = await fetch(`${API_URL}/banners`, {
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' },
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && Array.isArray(json.data)) {
+        return json.data.map((b: any) => ({
+          id: String(b.id),
+          title: b.title || 'ब्यानर विज्ञापन',
+          imageUrl: b.image_url || '',
+          targetUrl: b.target_url || '#',
+          position: b.position || 'header-top',
+          isActive: b.is_active === true || b.is_active === 1 || b.is_active === '1',
+          clicksCount: b.clicks_count || 0,
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch real banners from API:', err);
+  }
+  return [];
+}
+
 export async function getLandingData() {
   try {
     let formattedDbArticles: Article[] = [];
-    let dbBanners: any[] = [];
+    let dbBanners: BannerAd[] = [];
 
     // Fetch articles safely with fallback
     try {
       formattedDbArticles = await getDbArticles();
     } catch (err) {
       formattedDbArticles = [];
+    }
+
+    // Fetch real banners safely without dummy data
+    try {
+      dbBanners = await getDbBanners();
+    } catch (err) {
+      dbBanners = [];
     }
 
     // Map DB articles into categories
@@ -91,10 +124,10 @@ export async function getLandingData() {
       id: art.id,
       title: art.title,
       author: art.author || 'सनस्टार स्तम्भकार',
-      role: 'विशेष स्तम्भकार',
-      avatar: art.image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-      time: art.time,
-      source: art.source || 'Sunstar News',
+      role: art.author_role || art.authorRole || 'विशेष स्तम्भकार (सनस्टार विचार)',
+      avatar: art.author_image || art.authorImage || art.image || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+      time: art.read_time || art.readTime || art.time || '६ मिनेट पाठ',
+      source: art.source || 'Sunstar Opinion',
       summary: art.summary || art.title,
     }));
     const opinions: Opinion[] = supplementWithDummy(
@@ -146,29 +179,15 @@ export async function getLandingData() {
       5
     );
 
-    // 12. Timeline Feed
+    // 12. Timeline Feed (Extract latest 5 news - strictly articles)
     const timelineFeed = supplementWithDummy(
       formattedDbArticles,
-      SUNSTAR_DATA.latestTimeline,
-      6
+      getAllArticles(),
+      5
     );
 
-    // 13. Banners
-    const formattedBanners: BannerAd[] = dbBanners.map((b: any) => ({
-      id: String(b.id),
-      title: b.title || 'ब्यानर विज्ञापन',
-      imageUrl: b.image_url || '',
-      targetUrl: b.target_url || '#',
-      position: b.position || 'header-top',
-      isActive: Boolean(b.is_active),
-      clicksCount: b.clicks_count || 0,
-    }));
-
-    const banners = supplementWithDummy(
-      formattedBanners,
-      SUNSTAR_DATA.banners,
-      SUNSTAR_DATA.banners.length
-    );
+    // 13. Banners - strictly real database banners, NEVER dummy data!
+    const banners: BannerAd[] = dbBanners;
 
     const breakingNews = await getBreakingNews();
 
@@ -192,6 +211,8 @@ export async function getLandingData() {
       worldNews,
       pradeshNews: SUNSTAR_DATA.pradeshNews,
       timelineFeed,
+      latestTimeline: timelineFeed,
+      tajaSamachar: timelineFeed,
       banners,
     };
   } catch (error) {

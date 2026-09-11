@@ -40,29 +40,29 @@ export async function optimizeAndSaveImage(
     const targetDir = path.join(uploadsBaseDir, 'articles');
     await ensureDir(targetDir);
 
-    const featuredFilename = `${baseFilename}-16x9.webp`;
+    const featuredFilename = `${baseFilename}-main.webp`;
     const thumbnailFilename = `${baseFilename}-thumb.webp`;
 
     const featuredPath = path.join(targetDir, featuredFilename);
     const thumbnailPath = path.join(targetDir, thumbnailFilename);
 
-    // 1. Featured Image (Standardized 16:9 ratio: 800x450, low WebP size)
+    // 1. Featured Image: Never cut/crop, preserve aspect ratio, decrease size if > 1200px, convert to WebP
     const featuredMeta = await sharp(buffer)
-      .resize(800, 450, { fit: 'cover', position: 'center' })
-      .webp({ quality: 80 })
+      .resize({ width: 1200, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
       .toFile(featuredPath);
 
-    // 2. Thumbnail (Standardized 16:9 ratio: 400x225 for card grids)
-    await sharp(buffer)
-      .resize(400, 225, { fit: 'cover', position: 'center' })
-      .webp({ quality: 75 })
+    // 2. Thumbnail: Preserve aspect ratio, decrease size if > 600px, convert to WebP
+    const thumbMeta = await sharp(buffer)
+      .resize({ width: 600, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 80 })
       .toFile(thumbnailPath);
 
     return {
       url: `/uploads/articles/${featuredFilename}`,
       thumbnailUrl: `/uploads/articles/${thumbnailFilename}`,
-      width: featuredMeta.width || 800,
-      height: featuredMeta.height || 450,
+      width: featuredMeta.width || 1200,
+      height: featuredMeta.height || 675,
       format: 'webp',
     };
   } else if (preset === 'banner') {
@@ -72,10 +72,11 @@ export async function optimizeAndSaveImage(
     const bannerFilename = `${baseFilename}-banner.webp`;
     const bannerPath = path.join(targetDir, bannerFilename);
 
-    // Banner Image (Standardized 3:1 ratio: 1200x400, optimized WebP)
+    // Banner Image: Never cut/crop the banner (preserve logos, text, contact info)!
+    // Only decrease size if width > 1200px, preserve original aspect ratio, convert to WebP
     const bannerMeta = await sharp(buffer)
-      .resize(1200, 400, { fit: 'cover', position: 'center' })
-      .webp({ quality: 80 })
+      .resize({ width: 1200, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
       .toFile(bannerPath);
 
     return {
@@ -92,16 +93,16 @@ export async function optimizeAndSaveImage(
     const avatarFilename = `${baseFilename}-avatar.webp`;
     const avatarPath = path.join(targetDir, avatarFilename);
 
-    // Avatar Image (Standardized 1:1 ratio: 300x300, low size WebP)
+    // Avatar Image: Resize without cropping, convert to WebP
     const avatarMeta = await sharp(buffer)
-      .resize(300, 300, { fit: 'cover', position: 'center' })
-      .webp({ quality: 80 })
+      .resize({ width: 400, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
       .toFile(avatarPath);
 
     return {
       url: `/uploads/avatars/${avatarFilename}`,
-      width: avatarMeta.width || 300,
-      height: avatarMeta.height || 300,
+      width: avatarMeta.width || 400,
+      height: avatarMeta.height || 400,
       format: 'webp',
     };
   }

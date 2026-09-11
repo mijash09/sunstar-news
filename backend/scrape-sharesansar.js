@@ -1,33 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
-import SUNSTAR_DATA from '@/lib/data';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 60; // 60 seconds caching
-
-interface StockItem {
-  name: string;
-  symbol: string;
-  price: string;
-  changePercent: string;
-  changePoint: string;
-  isUp: boolean;
-}
-
-let cachedPayload: { isMarketOpen: boolean; stocks: StockItem[]; timestamp: number } | null = null;
-const CACHE_DURATION_MS = 60 * 1000;
-
-export async function GET(request: NextRequest) {
-  const now = Date.now();
-
-  // Return cached payload if less than 60 seconds old
-  if (cachedPayload && now - cachedPayload.timestamp < CACHE_DURATION_MS) {
-    return NextResponse.json({
-      success: true,
-      source: 'Cache (60s)',
-      ...cachedPayload,
-    });
-  }
+async function scrapeSharesansar() {
+  const fallbackStocks = [
+    { name: 'NABIL', symbol: 'NABIL', price: '520.00', changePercent: '+1.20%', changePoint: '+6.20', isUp: true },
+    { name: 'GBIME', symbol: 'GBIME', price: '215.00', changePercent: '+0.85%', changePoint: '+1.80', isUp: true },
+    { name: 'NICA', symbol: 'NICA', price: '480.00', changePercent: '-0.40%', changePoint: '-1.90', isUp: false },
+    { name: 'SHIVM', symbol: 'SHIVM', price: '495.00', changePercent: '+2.10%', changePoint: '+10.20', isUp: true },
+    { name: 'HIDCL', symbol: 'HIDCL', price: '198.50', changePercent: '+0.50%', changePoint: '+1.00', isUp: true },
+    { name: 'CHCL', symbol: 'CHCL', price: '380.00', changePercent: '-1.10%', changePoint: '-4.20', isUp: false },
+    { name: 'HDL', symbol: 'HDL', price: '1,420.00', changePercent: '+1.45%', changePoint: '+20.50', isUp: true },
+    { name: 'UPPER', symbol: 'UPPER', price: '240.00', changePercent: '+0.75%', changePoint: '+1.80', isUp: true },
+  ];
 
   try {
     const res = await fetch('https://www.sharesansar.com/live-trading', {
@@ -37,7 +20,6 @@ export async function GET(request: NextRequest) {
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9,ne;q=0.8',
       },
-      next: { revalidate: 60 },
     });
 
     if (!res.ok) {
@@ -46,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     const html = await res.text();
     const $ = cheerio.load(html);
-    const stocks: StockItem[] = [];
+    const stocks = [];
 
     // Scrape live trading table rows
     $('table tbody tr').each((_, element) => {
@@ -82,37 +64,24 @@ export async function GET(request: NextRequest) {
     const marketStatusText = $('.market-status, .market-info, h5, span').text().toLowerCase();
     const isMarketOpen = marketStatusText.includes('open') && !marketStatusText.includes('closed');
 
-    // Filter top active trending stocks
-    const trendingList =
-      stocks.length > 0
-        ? stocks.slice(0, 8)
-        : (SUNSTAR_DATA.trendingStocks as StockItem[]);
+    const trendingList = stocks.length > 0 ? stocks.slice(0, 8) : fallbackStocks;
 
-    cachedPayload = {
-      isMarketOpen: isMarketOpen,
-      stocks: trendingList,
-      timestamp: now,
-    };
-
-    return NextResponse.json({
+    console.log(JSON.stringify({
       success: true,
       source: 'Sharesansar Live NEPSE Proxy',
-      isMarketOpen: isMarketOpen,
+      isMarketOpen,
       stocks: trendingList,
       timestamp: new Date().toISOString(),
-    });
-  } catch (err: any) {
-    console.warn('NEPSE Scraper Fallback:', err.message);
-
-    // Fallback to cached payload or static SUNSTAR_DATA
-    const fallbackStocks = cachedPayload?.stocks || SUNSTAR_DATA.trendingStocks;
-
-    return NextResponse.json({
+    }));
+  } catch (err) {
+    console.log(JSON.stringify({
       success: true,
       source: 'Sunstar NEPSE Fallback Engine',
       isMarketOpen: false,
       stocks: fallbackStocks,
       error: err.message,
-    });
+    }));
   }
 }
+
+scrapeSharesansar();

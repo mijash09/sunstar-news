@@ -1,18 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Share2, Link2, Check, Facebook, Twitter, MessageCircle } from 'lucide-react';
+import { Share2, Link2, Check, Facebook, Twitter, MessageCircle, Download } from 'lucide-react';
 
 interface SocialShareBarProps {
   title?: string;
   url?: string;
   compact?: boolean;
+  articleId?: string;
+  imageUrl?: string;
 }
 
 export default function SocialShareBar({
   title = 'सनस्टार न्युज मुख्य समाचार',
   url,
   compact = false,
+  articleId,
+  imageUrl,
 }: SocialShareBarProps) {
   const [copied, setCopied] = useState(false);
 
@@ -20,6 +24,17 @@ export default function SocialShareBar({
     url || (typeof window !== 'undefined' ? window.location.href : 'https://sunstarnews.com');
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
+
+  const recordShare = async (platform: string) => {
+    if (!articleId) return;
+    try {
+      await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ articleId, platform }),
+      });
+    } catch (err) {}
+  };
 
   const handleCopy = async () => {
     try {
@@ -34,6 +49,7 @@ export default function SocialShareBar({
         document.body.removeChild(dummy);
       }
       setCopied(true);
+      recordShare('copy');
       setTimeout(() => setCopied(false), 2500);
     } catch (err) {
       console.error('Failed to copy link:', err);
@@ -47,11 +63,15 @@ export default function SocialShareBar({
           title,
           url: shareUrl,
         });
-      } catch (err) {
-        // User cancelled or share failed
-      }
+        recordShare('native');
+      } catch (err) {}
     }
   };
+
+  const downloadFilename = imageUrl ? imageUrl.split('/').pop() : '';
+  const downloadLink = imageUrl && imageUrl.startsWith('/storage/uploads/')
+    ? `/api/download/${downloadFilename}`
+    : (imageUrl || '#');
 
   return (
     <div
@@ -95,7 +115,7 @@ export default function SocialShareBar({
             letterSpacing: '-0.2px',
           }}
         >
-          सेयर गर्नुहोस्:
+          सेयर तथा डाउनलोड:
         </span>
       </div>
 
@@ -113,6 +133,7 @@ export default function SocialShareBar({
           href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => recordShare('facebook')}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -140,6 +161,7 @@ export default function SocialShareBar({
           href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => recordShare('twitter')}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -167,6 +189,7 @@ export default function SocialShareBar({
           href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => recordShare('whatsapp')}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -210,8 +233,38 @@ export default function SocialShareBar({
           title="लिङ्क कपी गर्नुहोस्"
         >
           {copied ? <Check size={15} color="#16a34a" /> : <Link2 size={15} />}
-          <span>{copied ? 'लिङ्क कपी भयो!' : 'लिङ्क कपी गर्नुहोस्'}</span>
+          <span>{copied ? 'लिङ्क कपी भयो!' : 'लिङ्क कपी'}</span>
         </button>
+
+        {/* Image Download Button */}
+        {imageUrl && (
+          <a
+            href={downloadLink}
+            download={downloadFilename || 'sunstar-news-image.jpg'}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: 'rgba(255, 85, 0, 0.1)',
+              color: 'var(--brand-orange)',
+              border: '1px solid rgba(255, 85, 0, 0.25)',
+              padding: '7px 14px',
+              borderRadius: '20px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.25s ease',
+            }}
+            className="share-btn-hover"
+            title="तस्बिर डाउनलोड गर्नुहोस्"
+          >
+            <Download size={15} />
+            <span>तस्बिर डाउनलोड</span>
+          </a>
+        )}
       </div>
     </div>
   );

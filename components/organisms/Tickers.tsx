@@ -14,6 +14,9 @@ export default function Tickers({ initialBreakingNews }: { initialBreakingNews?:
   const tickerRef = useRef<HTMLDivElement>(null);
   const [animDuration, setAnimDuration] = useState<number>(35);
 
+  const stockTrackRef = useRef<HTMLDivElement>(null);
+  const [stockAnimDuration, setStockAnimDuration] = useState<number>(145);
+
   useEffect(() => {
     let active = true;
     fetch('/api/landing-data')
@@ -65,6 +68,26 @@ export default function Tickers({ initialBreakingNews }: { initialBreakingNews?:
     }
   }, [breakingNews, displayNews.length]);
 
+  // Ensure stocks fill the line and repeat for 100% seamless marquee loop
+  let displayStocks = [...stocks];
+  if (displayStocks.length > 0) {
+    while (displayStocks.length < 12) {
+      displayStocks = displayStocks.concat(stocks);
+    }
+  }
+  const seamlessStocks = displayStocks.concat(displayStocks);
+
+  // Measure stock track width and enforce smooth uniform constant velocity (~50px / sec)
+  useEffect(() => {
+    if (stockTrackRef.current) {
+      const totalWidth = stockTrackRef.current.scrollWidth;
+      const halfWidth = totalWidth / 2; // Width of one set
+      const SPEED_PX_PER_SEC = 50; // Constant pixel speed
+      const calculatedDuration = Math.max(15, Math.round(halfWidth / SPEED_PX_PER_SEC));
+      setStockAnimDuration(calculatedDuration);
+    }
+  }, [stocks, displayStocks.length]);
+
   return (
     <div className="top-tickers-wrapper">
       {/* 1. Top Trending Live Stock Ticker Bar */}
@@ -75,28 +98,36 @@ export default function Tickers({ initialBreakingNews }: { initialBreakingNews?:
             NEPSE Live..
           </div>
 
-          {/* Stock Ticker Items Row */}
+          {/* Stock Ticker Items Row (Seamless Auto-Scrolling) */}
           <div className="stock-ticker-list">
-            {stocks.map((stock, idx) => (
-              <div key={stock.symbol || idx} className="stock-ticker-item">
-                <div className="stock-company-name" title={stock.name}>
-                  {stock.name}
+            <div
+              className="stock-ticker-track"
+              ref={stockTrackRef}
+              style={{
+                animationDuration: `${stockAnimDuration}s`,
+              }}
+            >
+              {seamlessStocks.map((stock, idx) => (
+                <div key={stock.symbol ? `${stock.symbol}-${idx}` : idx} className="stock-ticker-item">
+                  <div className="stock-company-name" title={stock.name}>
+                    {stock.name}
+                  </div>
+                  <div className="stock-main-row">
+                    <span className="stock-symbol">{stock.symbol}</span>
+                    <span className="stock-price">{stock.price}</span>
+                  </div>
+                  <div
+                    className={`stock-change-row ${
+                      stock.isUp ? 'stock-change-up' : 'stock-change-down'
+                    }`}
+                  >
+                    <span>{stock.changePercent}</span>
+                    <span>{stock.changePoint}</span>
+                    <span>{stock.isUp ? '↗' : '↘'}</span>
+                  </div>
                 </div>
-                <div className="stock-main-row">
-                  <span className="stock-symbol">{stock.symbol}</span>
-                  <span className="stock-price">{stock.price}</span>
-                </div>
-                <div
-                  className={`stock-change-row ${
-                    stock.isUp ? 'stock-change-up' : 'stock-change-down'
-                  }`}
-                >
-                  <span>{stock.changePercent}</span>
-                  <span>{stock.changePoint}</span>
-                  <span>{stock.isUp ? '↗' : '↘'}</span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* View Stock Live Button Box */}

@@ -9,12 +9,10 @@ import Navigation from '@/components/organisms/Navigation';
 import Tickers from '@/components/organisms/Tickers';
 import HeroCard from '@/components/organisms/HeroCard';
 import TimelineFeed from '@/components/organisms/TimelineFeed';
-import PollWidget from '@/components/organisms/PollWidget';
 import Footer from '@/components/organisms/Footer';
 import SearchModal from '@/components/organisms/SearchModal';
 import MainNewsLayout from '@/components/templates/MainNewsLayout';
 import NewsSectionEkantipur from '@/components/organisms/NewsSectionEkantipur';
-import OpinionGridSection from '@/components/organisms/OpinionGridSection';
 import RightLeadGridSection from '@/components/organisms/RightLeadGridSection';
 import PradeshTabs from '@/components/organisms/PradeshTabs';
 import RashifalSection from '@/components/organisms/RashifalSection';
@@ -80,6 +78,11 @@ export default function HomePageClient() {
       {/* 3. Stock Market & Breaking News Tickers Below Header */}
       <Tickers />
 
+      {/* Top Header Banner Slot */}
+      <div className="container" style={{ padding: '4px 16px' }}>
+        <AdBanner position="header-top" banners={pageData.banners || []} />
+      </div>
+
       <main className="main-content-layout container">
         {/* 5. Main Content Layout with 70% Left Main Content & 30% Right Sidebar */}
         <MainNewsLayout
@@ -91,15 +94,15 @@ export default function HomePageClient() {
             />
           }
           sidebarContent={
-            <>
-              <TimelineFeed onSelectArticle={handleSelectArticle} />
-              <PollWidget />
-            </>
+            <TimelineFeed
+              items={pageData.timelineFeed || (pageData as any).latestTimeline || (pageData as any).tajaSamachar}
+              onSelectArticle={handleSelectArticle}
+            />
           }
         />
 
-        {/* Digital Ad Banner Block */}
-        <AdBanner />
+        {/* Hero Below Banner */}
+        <AdBanner position="home-hero-below" banners={pageData.banners || []} />
 
         {/* 2. EXCLUSIVE (विशेष समाचार) */}
         <RightLeadGridSection
@@ -109,7 +112,6 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="EXCLUSIVE" href="/category/exclusive" />
-        <AdBanner />
 
         {/* 3. राजनीति (Politics) */}
         <NewsSectionEkantipur
@@ -120,7 +122,9 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="राजनीति" href="/category/politics" />
-        <AdBanner />
+
+        {/* Mid Content 1 Banner */}
+        <AdBanner position="mid-content-1" banners={pageData.banners || []} />
 
         {/* 4. अर्थ / वाणिज्य (Business & Economy) */}
         <RightLeadGridSection
@@ -130,16 +134,6 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="अर्थ / वाणिज्य" href="/category/business" />
-        <AdBanner />
-
-        {/* 5. विचार / विश्लेषण (Opinions & Analysis) */}
-        <OpinionGridSection
-          title="✍️ विचार / विश्लेषण (Opinions & Analysis)"
-          opinions={pageData.opinions || SUNSTAR_DATA.opinions}
-          onSelectArticle={handleSelectArticle}
-        />
-        <LoadMoreButton label="विचार" href="/category/opinion" />
-        <AdBanner />
 
         {/* 6. खेलकुद (Sports) */}
         <RightLeadGridSection
@@ -149,7 +143,9 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="खेलकुद" href="/category/sports" />
-        <AdBanner />
+
+        {/* Mid Content 2 Banner */}
+        <AdBanner position="mid-content-2" banners={pageData.banners || []} />
 
         {/* 7. मनोरञ्जन (Entertainment) */}
         <RightLeadGridSection
@@ -159,7 +155,6 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="मनोरञ्जन" href="/category/entertainment" />
-        <AdBanner />
 
         {/* 8. फिचर समाचार (Feature Story) */}
         <RightLeadGridSection
@@ -169,7 +164,6 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="फिचर" href="/category/feature" />
-        <AdBanner />
 
         {/* 10. प्रविधि समाचार (Science & Tech) */}
         <RightLeadGridSection
@@ -179,7 +173,6 @@ export default function HomePageClient() {
           onSelectArticle={handleSelectArticle}
         />
         <LoadMoreButton label="प्रविधि" href="/category/technology" />
-        <AdBanner />
 
         {/* 11. विश्व समाचार (World News) */}
         <RightLeadGridSection
@@ -192,11 +185,12 @@ export default function HomePageClient() {
 
         {/* 12. Pradesh Tabs Section (प्रदेश समाचार) */}
         <PradeshTabs onSelectArticle={handleSelectArticle} />
-        <AdBanner />
 
         {/* 13. Rashifal Section (राशिफल) */}
         <RashifalSection />
-        <AdBanner />
+
+        {/* Footer Top Banner */}
+        <AdBanner position="footer-top" banners={pageData.banners || []} />
       </main>
 
       <Footer onOpenSearch={() => setIsSearchOpen(true)} />
